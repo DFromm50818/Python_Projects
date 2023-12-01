@@ -1,0 +1,17 @@
+[[package]]
+name = "words"
+version = "0.0.1"
+description = "Tool to get a large collection of words."
+category = "main"
+optional = false
+python-versions = "*"
+
+[metadata]
+lock-version = "1.1"
+python-versions = "^3.8"
+content-hash = "44f3cb21d32c2d911d1ae3a2e3d933b87c1f5d7c3494e42033e52872d02e8dbd"
+
+[metadata.files]
+words = [
+    {file = "words-0.0.1.tar.gz", hash = "sha256:6c26114adb50256e1ec2d6a09a50fc611200438558f899d72dd51a2694b02467"},
+]
