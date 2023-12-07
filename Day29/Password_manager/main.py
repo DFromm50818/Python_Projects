@@ -1,27 +1,47 @@
 from tkinter import *
-import random
+from tkinter import messagebox
+from random import randint, choice, shuffle
+import pyperclip
 
 BLACK = "black"
 WHITE = "white"
 
-def gen_pw():
-    list = "abcdefghijklmnopqrstuvwxyz1234567890?!_-ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    liste = list.split(' ')
-    print(liste)
-    for i in list:
-        if i.isupper():
-            print(i)
-    # for digit in range(len(list)):
-    #     digit_numb =
+def generate_password():
+    entry_pw.delete(0, END)
 
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
+               'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
+
+    pw_new = [choice(letters) for _ in range(randint(8, 10))] + \
+             [choice(symbols) for _ in range(randint(2, 4))] + \
+             [choice(numbers) for _ in range(randint(2, 4))]
+
+    shuffle(pw_new)
+    pw_user = "".join(pw_new)
+    entry_pw.insert(0, string=f"{pw_user}")
+    pyperclip.copy(pw_user)
 
 def save_data():
-    save_data = open("data.txt", "a")
-    save_data.write(f"{entry_website.get()} | {entry_user.get()} | {entry_pw.get()} \n")
-    save_data.close()
-    entry_website.delete(0, END)
-    # entry_user.delete(0, END)
-    entry_pw.delete(0, END)
+
+    if len(entry_website.get()) == 0 or len(entry_user.get()) == 0 or len(entry_pw.get()) == 0:
+        messagebox.showerror(title="Error!", message="The data could not be saved. Please fill out all entries.")
+
+    else:
+        rdy_to_save = messagebox.askokcancel(title="Are you sure you want to save?",
+                                             message=f"These are the details you entered: \n\nWebsite: "
+                                                     f"{entry_website.get()} \nEmail: {entry_user.get()} "
+                                                     f"\nPassword: {entry_pw.get()} \n\nIs it ok to save?")
+
+        if rdy_to_save == True:
+            with open("data.txt", "a") as save_data:
+                save_data.write(f"{entry_website.get()} | {entry_user.get()} | {entry_pw.get()} \n")
+                entry_website.delete(0, END)
+                # entry_user.delete(0, END)
+                entry_pw.delete(0, END)
+            messagebox.showinfo(title="Save data", message="Data save success")
 
 window = Tk()
 window.title("Password Manager")
@@ -53,7 +73,7 @@ label_user.grid(row=2, column=0)
 label_pw = Label(text="Password: ", bg=BLACK, fg=WHITE)
 label_pw.grid(row=3, column=0)
 
-button_gen_pw = Button(window, text="Generate Password", command=gen_pw, bg=BLACK, fg=WHITE)
+button_gen_pw = Button(window, text="Generate Password", command=generate_password, bg=BLACK, fg=WHITE)
 button_gen_pw.grid(row=3, column=2)
 
 button_add = Button(window, width=44, text="Add", command=save_data, bg=BLACK, fg=WHITE)
