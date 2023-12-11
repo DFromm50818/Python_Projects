@@ -1,11 +1,6 @@
-from tkinter import *
-from tkinter import messagebox
-from tkinter import filedialog
 from random import randint, choice, shuffle
 import pyperclip
 from cryptography.fernet import Fernet
-import json
-from tkinter import ttk
 
 class PasswordTools:
     def __init__(self):
@@ -13,7 +8,6 @@ class PasswordTools:
         self.pw_user = ""
 
     def password_check(self, password):
-        print(password)
         digits = ''.join(filter(str.isdigit, password))
         letter_lower = ''.join(filter(str.islower, password))
         letter_upper = ''.join(filter(str.isupper, password))
@@ -24,6 +18,7 @@ class PasswordTools:
             self.light = "yellow"
         else:
             self.light = "red"
+        return self.light
 
     def generate_password(self):
         letters_upper = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -41,7 +36,4 @@ class PasswordTools:
 
         shuffle(pw_new)
         self.pw_user = "".join(pw_new)
-        # Gui. .insert(0, string=f"{pw_user}")
-        # entry_pw.insert(END, string=PasswordTools.generate_password)
         pyperclip.copy(self.pw_user)
-        # return self.pw_user
