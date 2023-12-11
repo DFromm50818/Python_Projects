@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import *
 from tools import PasswordTools
 from data import Data
@@ -11,17 +12,15 @@ WHITE = "white"
 class WindowGUI(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        # self.entry_pw = None
-        # self.entry_user = None
-        # self.entry_website = None
-        # self.picture_png = None
 
         self.parent = parent
         self.parent.title("Password Manager")
         self.parent.config(padx=50, pady=50, bg=BLACK)
 
+        self.websites = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
+        # self.data.open_json_file()
 
         self.canvas = Canvas(width=200, height=200, bg=BLACK, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
@@ -75,6 +74,13 @@ class WindowGUI(tk.Frame):
         self.button_load = Button(self.parent, text="Load", command=self.data.open_json_file, bg=BLACK, fg=WHITE, width=4)
         self.button_load.grid(row=1, column=4)
 
+        if self.data.load_status:
+            self.combobox = ttk.Combobox(self.parent, textvariable=self.websites)
+            self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
+            self.combobox.grid(row=0, column=0)
+            self.combobox["values"] = self.data.website_option
+
+
     def copy_pw(self):
         pyperclip.copy(self.entry_pw.get())
 
@@ -95,8 +101,9 @@ class WindowGUI(tk.Frame):
                                              f"{website} \nEmail: {user} "
                                              f"\nPassword: {pw} \n\nIs it ok to save?")
             if Data.rdy_to_save:
-                self.data.save_data(website, user, pw)
-                messagebox.showinfo(title="Save data", message="Data save success")
+                self.data.save_data(website, user, self.tools.encrypted_pw)
+                self.entry_website.delete(0, END)
+                self.entry_pw.delete(0, END)
         except:
             messagebox.showinfo(title="Canceling operation!", message="User cancelled operation.")
 
@@ -121,5 +128,7 @@ class WindowGUI(tk.Frame):
         self.canvas_light_update(light_status)
         self.parent.after(500, self.check_status)
 
-
+    def on_combobox_select(self, event):
+        selected_value = self.websites.get()
+        print("Ausgewählte Option:", selected_value)
 
