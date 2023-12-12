@@ -1,7 +1,7 @@
 from random import randint, choice, shuffle
 import pyperclip
 from cryptography.fernet import Fernet
-
+import string
 
 
 class PasswordTools:
@@ -17,42 +17,34 @@ class PasswordTools:
         letter_lower = ''.join(filter(str.islower, password))
         letter_upper = ''.join(filter(str.isupper, password))
         symbols = ''.join(filter(lambda x: not x.isalnum(), password))
-        if len(digits) >= 3 and len(symbols) >= 3 and len(letter_upper) >= 4 and len(letter_lower) >= 4:
-            self.light = "green"
-        elif len(digits) >= 2 and len(symbols) >= 2 and len(letter_upper) >= 3 and len(letter_lower) >= 3:
-            self.light = "yellow"
-        else:
-            self.light = "red"
+
+        conditions = [
+            len(digits) >= 3 and len(symbols) >= 3 and len(letter_upper) >= 4 and len(letter_lower) >= 4,
+            len(digits) >= 2 and len(symbols) >= 2 and len(letter_upper) >= 3 and len(letter_lower) >= 3
+        ]
+
+        self.light = "green" if any(conditions) else "yellow" if password else "red"
         return self.light
 
     def generate_password(self):
-        letters_upper = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-                         'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-        letters_lower = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-                         't', 'u',
-                         'v', 'w', 'x', 'y', 'z']
-        numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
-
-        pw_new = [choice(letters_upper) for _ in range(randint(4, 5))] + \
-                 [choice(letters_lower) for _ in range(randint(4, 5))] + \
-                 [choice(symbols) for _ in range(randint(3, 4))] + \
-                 [choice(numbers) for _ in range(randint(3, 4))]
-
+        pw_categories = [
+            (string.ascii_uppercase, randint(4, 8)),
+            (string.ascii_lowercase, randint(4, 8)),
+            (string.digits, randint(3, 6)),
+            (string.punctuation, randint(3, 6))
+        ]
+        pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
         shuffle(pw_new)
         self.pw_user = "".join(pw_new)
         pyperclip.copy(self.pw_user)
-        self.encrypt_password()
-
+        return self.encrypt_password()
 
     def encrypt_password(self):
         self.encrypted_pw = self.cipher_suite.encrypt(self.pw_user.encode())
         return self.encrypted_pw
 
     def decrypt_password(self, encrypt_pw):
-        self.pw_user = self.cipher_suite.decrypt(encrypt_pw)
-        return self.pw_user
-
+        return self.cipher_suite.decrypt(encrypt_pw)
 
 
     # loaded_encrypted = encrypted_pw  # load_encrypted_password_from_file()

@@ -1,9 +1,8 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter import *
 from tools import PasswordTools
 from data import Data
-from tkinter import messagebox
 import pyperclip
 
 BLACK = "black"
@@ -20,7 +19,6 @@ class WindowGUI(tk.Frame):
         self.websites = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
-        # self.data.open_json_file()
 
         self.canvas = Canvas(width=200, height=200, bg=BLACK, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
@@ -92,19 +90,19 @@ class WindowGUI(tk.Frame):
             website = self.entry_website.get()
             user = self.entry_user.get()
             pw = self.entry_pw.get()
-            if len(website) == 0 or len(user) == 0 or len(pw) == 0:
+            if not all([website, user, pw]):
                 messagebox.showerror(title="Error!",
                                      message="The data could not be saved. Please fill out all entries.")
             else:
-                Data.rdy_to_save = messagebox.askokcancel(title="Are you sure you want to save?",
-                                     message=f"These are the details you entered: \n\nWebsite: "
-                                             f"{website} \nEmail: {user} "
-                                             f"\nPassword: {pw} \n\nIs it ok to save?")
-            if Data.rdy_to_save:
-                self.data.save_data(website, user, self.tools.encrypted_pw)
-                self.entry_website.delete(0, END)
-                self.entry_pw.delete(0, END)
-        except:
+                response = messagebox.askokcancel(title="Are you sure you want to save?",
+                                                  message=f"These are the details you entered: \n\nWebsite: "
+                                                          f"{website} \nEmail: {user} "
+                                                          f"\nPassword: {pw} \n\nIs it ok to save?")
+                if response:
+                    self.data.save_data(website, user, self.tools.encrypted_pw)
+                    self.entry_website.delete(0, END)
+                    self.entry_pw.delete(0, END)
+        except Exception as e:
             messagebox.showinfo(title="Canceling operation!", message="User cancelled operation.")
 
     def insert_pw_entry(self):
@@ -131,4 +129,3 @@ class WindowGUI(tk.Frame):
     def on_combobox_select(self, event):
         selected_value = self.websites.get()
         print("Ausgewählte Option:", selected_value)
-
