@@ -116,16 +116,48 @@ class WindowGUI(tk.Frame):
         # print(self.data.website_option)
         # print(self.data.load_status)
         self.parent.after(500, self.check_status)
-        
+
     def show_data_window(self):
 
         self.website_show = ""
         self.user_show = ""
         self.pw_show = ""
 
+        def insert_text():
+            text_website.configure(state="normal")
+            text_user.configure(state="normal")
+            text_pw.configure(state="normal")
+
+            if len(text_website.get("1.0", "end-1c")) > 0:
+                text_website.delete("1.0", END)
+                text_user.delete("1.0", END)
+                text_pw.delete("1.0", END)
+
+            text_website.insert(END, self.website_show)
+            text_user.insert(END, self.user_show)
+            text_pw.insert(END, self.pw_show)
+
+            text_website.configure(state="disabled")
+            text_user.configure(state="disabled")
+            text_pw.configure(state="disabled")
+
+        def copy_text_user():
+            pyperclip.copy(text_user.get("1.0", "end-1c"))
+        def copy_text_pw():
+            pyperclip.copy(text_pw.get("1.0", "end-1c"))
+
         show_window = Tk()
         show_window.title("Show Item Data")
         show_window.config(padx=50, pady=50, bg=BLACK)
+
+        text_website = tk.Text(show_window, wrap="word", height=1, width=52)
+        text_website.grid(row=1, column=1)
+
+        text_user = tk.Text(show_window, wrap="word", height=1, width=52)
+        text_user.grid(row=2, column=1)
+
+        text_pw = tk.Text(show_window, wrap="word", height=1, width=52)
+        text_pw.grid(row=3, column=1)
 
         def on_combobox_select(event):
             selected_value = event.widget.get()
@@ -138,18 +170,26 @@ class WindowGUI(tk.Frame):
                         insert_text()
 
         combobox = ttk.Combobox(show_window, width=48, values=self.data.website_option)
-        combobox.grid(row=1, column=1)
+        combobox.grid(row=0, column=1)
         combobox.bind("<<ComboboxSelected>>", on_combobox_select)
 
-        label_pw = tk.Label(show_window, text="Load Filedata: ", bg="black", fg="white")
-        label_pw.grid(row=1, column=0, padx=0, pady=4)
+        label_load_filedata = tk.Label(show_window, text="Load Filedata: ", bg="black", fg="white")
+        label_load_filedata.grid(row=0, column=0, padx=0, pady=4)
 
-        def insert_text():
-            text = tk.Text(show_window, wrap="word", height=10, width=40)
-            text.insert(tk.END, self.website_show)
-            text.configure(state="disabled")  # Macht das Text-Widget schreibgeschützt
-            # text.bind("<1>", do_nothing)  # Verhindert das Bearbeiten per Mausklick
+        label_text_website = Label(show_window, text="Website: ", bg=BLACK, fg=WHITE)
+        label_text_website.grid(row=1, column=0)
 
+        label_text_user = Label(show_window, text="Email/Username: ", bg=BLACK, fg=WHITE)
+        label_text_user.grid(row=2, column=0)
+
+        label_text_pw = Label(show_window, text="Password: ", bg=BLACK, fg=WHITE)
+        label_text_pw.grid(row=3, column=0)
+
+        data_load_copy_user = Button(show_window, text="Copy", command=copy_text_user, bg=BLACK, fg=WHITE, width=4)
+        data_load_copy_user.grid(row=2, column=2)
+
+        data_load_copy_pw = Button(show_window, text="Copy", command=copy_text_pw, bg=BLACK, fg=WHITE, width=4)
+        data_load_copy_pw.grid(row=3, column=2)
 
 
 
