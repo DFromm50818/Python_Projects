@@ -7,9 +7,9 @@ class PasswordTools:
     def __init__(self):
         self.light = "grey"
         self.pw_user = ""
-        self.encrypted_pw = b""
+        self.encrypted_pw = None
         self.key = Fernet.generate_key()
-        self.cipher_suite = Fernet(b'o5mH4zyX11wzn-dtIYaV1SmHcDLsN-ClpelY9WD3uP8=')
+        self.cipher_suite = Fernet(b'L7CRVk_CnF40i9exhmYzS397F-XGYvNh0QJ2fi5O4GU=')
 
     def password_check(self, password):
         digits = ''.join(filter(str.isdigit, password))
@@ -42,7 +42,8 @@ class PasswordTools:
         return self.encrypted_pw
 
     def decrypt_password(self, encrypt_pw):
-        return self.cipher_suite.decrypt(encrypt_pw)
+        byte_format_password = encrypt_pw.encode('utf-8')
+        return self.cipher_suite.decrypt(byte_format_password)
 
 
     # loaded_encrypted = encrypted_pw  # load_encrypted_password_from_file()
