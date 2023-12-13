@@ -39,7 +39,7 @@ class Data:
                                                   f"\nPassword: {password} \n\nIs it ok to save?")
         if response:
             try:
-                json_encrypt_pw = password_encrypt.decode("'utf-8")
+                json_encrypt_pw = password_encrypt.decode('utf-8')
                 new_entry = {"Website/URL": website, "Email/Username": user, "Password": json_encrypt_pw}
                 if not self.json_data_path:
                     self.open_json_file()
@@ -55,3 +55,6 @@ class Data:
         for item in self.read_file:
             if key in item:
                 self.website_option.append(item[key])
+
+    def delete_item(self, item):
+        None

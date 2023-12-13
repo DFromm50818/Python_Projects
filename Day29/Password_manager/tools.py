@@ -25,10 +25,10 @@ class PasswordTools:
 
     def generate_password(self):
         pw_categories = [
-            (string.ascii_uppercase, randint(4, 8)),
-            (string.ascii_lowercase, randint(4, 8)),
-            (string.digits, randint(3, 6)),
-            (string.punctuation, randint(3, 6))
+            (string.ascii_uppercase, randint(5, 10)),
+            (string.ascii_lowercase, randint(5, 10)),
+            (string.digits, randint(4, 8)),
+            (string.punctuation, randint(4, 8))
         ]
         pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
         shuffle(pw_new)

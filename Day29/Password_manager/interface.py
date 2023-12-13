@@ -15,7 +15,7 @@ class WindowGUI(tk.Frame):
         self.parent = parent
         self.parent.title("Password Manager")
         self.parent.config(padx=50, pady=50, bg=BLACK)
-        self.parent.protocol("WM_DELETE_WINDOW", self.on_closing_main_window)
+        # self.parent.protocol("WM_DELETE_WINDOW", self.on_closing_main_window)
 
         self.websites = tk.StringVar()
         self.tools = PasswordTools()
@@ -76,13 +76,13 @@ class WindowGUI(tk.Frame):
         self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
         self.button_show_item_in_file.grid(row=1, column=2)
 
-    def close_slave_window(self):
-        self.show_window.destroy()
-
-    def on_closing_main_window(self):
-        if self.show_window.winfo_exists():
-            self.show_window.destroy()
-        self.parent.destroy()
+    # def close_slave_window(self):
+    #     self.show_window.destroy()
+    #
+    # def on_closing_main_window(self):
+    #     if self.show_window.winfo_exists():
+    #         self.show_window.destroy()
+    #     self.parent.destroy()
 
     def check_open_file(self):
         if len(self.data.json_data_path) == 0:
@@ -130,6 +130,9 @@ class WindowGUI(tk.Frame):
         self.pw_show = ""
         self.encrypted_pw = None
 
+        def delete_data():
+            None
+
         def insert_text():
             text_website.configure(state="normal")
             text_user.configure(state="normal")
@@ -159,14 +162,14 @@ class WindowGUI(tk.Frame):
         self.show_window.title("Load Item Data")
         self.show_window.config(padx=50, pady=50, bg=BLACK)
 
-        text_website = tk.Text(self.show_window, wrap="word", height=1, width=52)
-        text_website.grid(row=1, column=1)
+        text_website = Text(self.show_window, wrap="word", height=1, width=52)
+        text_website.grid(row=1, column=1, rowspan=2)
 
-        text_user = tk.Text(self.show_window, wrap="word", height=1, width=52)
-        text_user.grid(row=2, column=1)
+        text_user = Text(self.show_window, wrap="word", height=1, width=52)
+        text_user.grid(row=2, column=1, rowspan=2)
 
-        text_pw = tk.Text(self.show_window, wrap="word", height=1, width=52)
-        text_pw.grid(row=3, column=1)
+        text_pw = Text(self.show_window, wrap="word", height=1, width=52)
+        text_pw.grid(row=3, column=1, rowspan=2)
 
         def on_combobox_select(event):
             selected_value = event.widget.get()
@@ -180,11 +183,11 @@ class WindowGUI(tk.Frame):
                         insert_text()
 
         combobox = ttk.Combobox(self.show_window, width=48, values=self.data.website_option)
-        combobox.grid(row=0, column=1)
+        combobox.grid(row=0, column=1, rowspan=2)
         combobox.bind("<<ComboboxSelected>>", on_combobox_select)
 
         label_load_filedata = tk.Label(self.show_window, text="Load Filedata: ", bg="black", fg="white")
-        label_load_filedata.grid(row=0, column=0, padx=0, pady=4)
+        label_load_filedata.grid(row=0, column=0)
 
         label_text_website = Label(self.show_window, text="Website/URL: ", bg=BLACK, fg=WHITE)
         label_text_website.grid(row=1, column=0)
@@ -196,13 +199,15 @@ class WindowGUI(tk.Frame):
         label_text_pw.grid(row=3, column=0)
 
         data_load_copy_user = Button(self.show_window, text="Copy", command=copy_text_user, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_user.grid(row=2, column=2)
+        data_load_copy_user.grid(row=2, column=3)
 
         data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_pw, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_pw.grid(row=3, column=2)
+        data_load_copy_pw.grid(row=3, column=3)
 
         data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_website, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_pw.grid(row=1, column=2)
+        data_load_copy_pw.grid(row=1, column=3)
+
+        data_load_delete_item = Button(self.show_window, text="Delete Item", command=delete_data, bg=BLACK, fg=WHITE, width=4)
+        data_load_delete_item.grid(row=4, column=2)
 
         self.show_window.mainloop()
-
