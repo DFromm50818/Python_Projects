@@ -4,6 +4,7 @@ import os
 
 class Data:
     def __init__(self):
+        self.load_items = []
         self.load_status = False
         self.json_data_path = ""
         self.read_file = []
@@ -17,9 +18,8 @@ class Data:
                 with open(file_path, "r") as file:
                     self.json_data_path = os.path.abspath(file_path)
                     self.read_file = json.load(file)
-                self.load_data_options()
+                self.load_website_options()
                 self.load_status = True
-                # self.
                 messagebox.showinfo(title="Success!", message="File loaded successfully.")
             except FileNotFoundError:
                 messagebox.showinfo(title="Error!", message="File not found.")
@@ -50,8 +50,12 @@ class Data:
             except Exception as e:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
 
-    def load_data_options(self):
+    def load_website_options(self):
         key = "Website"
         for item in self.read_file:
             if key in item:
                 self.website_option.append(item[key])
+                # self.load_items.append(item)
+
+
+

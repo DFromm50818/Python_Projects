@@ -55,6 +55,12 @@ class WindowGUI(tk.Frame):
         self.button_add = Button(self.parent, width=44, text="Add Entries", command=self.collect_entries, bg=BLACK, fg=WHITE)
         self.button_add.grid(row=6, column=1, columnspan=2)
 
+        self.button_copy_user = Button(self.parent, text="Copy", command=self.copy_user, bg=BLACK, fg=WHITE, width=4)
+        self.button_copy_user.grid(row=3, column=4)
+
+        self.button_copy_pw = Button(self.parent, text="Copy", command=self.copy_pw, bg=BLACK, fg=WHITE, width=4)
+        self.button_copy_pw.grid(row=4, column=4)
+
         self.canvas_oval = Canvas(width=20, height=20, bg=BLACK, highlightthickness=0)
         self.canvas_oval.create_oval(1, 1, 19, 19, outline="black", fill="grey")
         self.canvas_oval.grid(row=7, column=0)
@@ -63,29 +69,16 @@ class WindowGUI(tk.Frame):
         self.label_secure = Label(text="Password\nsecure?", bg=BLACK, fg=WHITE)
         self.label_secure.grid(row=5, column=0)
 
-        self.button_copy_user = Button(self.parent, text="Copy", command=self.copy_user, bg=BLACK, fg=WHITE, width=4)
-        self.button_copy_user.grid(row=3, column=4)
+        self.button_load_file = Button(self.parent, text="Load File", command=self.data.open_json_file, bg=BLACK, fg=WHITE, width=15)
+        self.button_load_file.grid(row=1, column=1)
 
-        self.button_copy_pw = Button(self.parent, text="Copy", command=self.copy_pw, bg=BLACK, fg=WHITE, width=4)
-        self.button_copy_pw.grid(row=4, column=4)
-
-        self.button_load = Button(self.parent, text="Load", command=self.check_open_file, bg=BLACK, fg=WHITE, width=4)
-        self.button_load.grid(row=2, column=4)
-
-        self.combobox = ttk.Combobox(self.parent, width=48)
-        self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
+        self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
+        self.button_show_item_in_file.grid(row=1, column=2)
 
     def check_open_file(self):
-        self.data.open_json_file()
-        self.show_load_websites()
-
-    def show_load_websites(self):
-        if self.data.load_status:
-            self.combobox["values"] = self.data.website_option
-            self.combobox.grid(row=1, column=1)
-            self.label_pw = Label(text="Load Filedata: ", bg=BLACK, fg=WHITE)
-            self.label_pw.grid(row=1, column=0)
-            self.label_pw.config(padx=0, pady=4)
+        if len(self.data.json_data_path) == 0:
+            self.data.open_json_file()
+        self.show_data_window()
 
     def copy_pw(self):
         pyperclip.copy(self.entry_pw.get())
@@ -123,7 +116,42 @@ class WindowGUI(tk.Frame):
         # print(self.data.website_option)
         # print(self.data.load_status)
         self.parent.after(500, self.check_status)
+        
+    def show_data_window(self):
 
-    def on_combobox_select(self, event):
-        selected_value = self.websites.get()
-        print("Ausgewählte Option:", selected_value)
+        self.website_show = ""
+        self.user_show = ""
+        self.pw_show = ""
+
+        show_window = Tk()
+        show_window.title("Show Item Data")
+        show_window.config(padx=50, pady=50, bg=BLACK)
+
+        def on_combobox_select(event):
+            selected_value = event.widget.get()
+            for item in self.data.read_file:
+                for key, value in item.items():
+                    if key == "Website" and selected_value in value:
+                        self.website_show = item["Website"]
+                        self.user_show = item["Email/Username"]
+                        self.pw_show = item["Password"]
+                        insert_text()
+
+        combobox = ttk.Combobox(show_window, width=48, values=self.data.website_option)
+        combobox.grid(row=1, column=1)
+        combobox.bind("<<ComboboxSelected>>", on_combobox_select)
+
+        label_pw = tk.Label(show_window, text="Load Filedata: ", bg="black", fg="white")
+        label_pw.grid(row=1, column=0, padx=0, pady=4)
+
+        def insert_text():
+            text = tk.Text(show_window, wrap="word", height=10, width=40)
+            text.insert(tk.END, self.website_show)
+            text.configure(state="disabled")  # Macht das Text-Widget schreibgeschützt
+            # text.bind("<1>", do_nothing)  # Verhindert das Bearbeiten per Mausklick
+
+
+
+
+        show_window.mainloop()
+
