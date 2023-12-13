@@ -45,12 +45,6 @@ class PasswordTools:
         byte_format_password = encrypt_pw.encode('utf-8')
         return self.cipher_suite.decrypt(byte_format_password)
 
-
-    # loaded_encrypted = encrypted_pw  # load_encrypted_password_from_file()
-    # decrypted_password = cipher_suite.decrypt(loaded_encrypted).decode()
-    # print(decrypted_password)
-
-    # cipher_suite = Fernet(self.open_file_key())
     # def open_file_key(self):
     #     try:
     #         key_file = filedialog.askopenfilename(filetypes=[("DAT files", "*.dat")])

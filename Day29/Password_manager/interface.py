@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from tkinter import *
 from tools import PasswordTools
 from data import Data
@@ -37,7 +37,7 @@ class WindowGUI(tk.Frame):
         self.entry_pw = Entry(self.parent, width=52)
         self.entry_pw.grid(row=4, column=1, columnspan=2)
 
-        self.label_website = Label(text="Website: ", bg=BLACK, fg=WHITE)
+        self.label_website = Label(text="Website/URL: ", bg=BLACK, fg=WHITE)
         self.label_website.grid(row=2, column=0)
         self.label_website.config(padx=0, pady=3)
 
@@ -80,8 +80,9 @@ class WindowGUI(tk.Frame):
         self.show_window.destroy()
 
     def on_closing_main_window(self):
-        self.show_window.destroy()  # Close the slave window when the main window is closed
-        self.parent.destroy()  # Close the main window
+        if self.show_window.winfo_exists():
+            self.show_window.destroy()
+        self.parent.destroy()
 
     def check_open_file(self):
         if len(self.data.json_data_path) == 0:
@@ -147,6 +148,8 @@ class WindowGUI(tk.Frame):
             text_user.configure(state="disabled")
             text_pw.configure(state="disabled")
 
+        def copy_text_website():
+            pyperclip.copy(text_website.get("1.0", "end-1c"))
         def copy_text_user():
             pyperclip.copy(text_user.get("1.0", "end-1c"))
         def copy_text_pw():
@@ -169,8 +172,8 @@ class WindowGUI(tk.Frame):
             selected_value = event.widget.get()
             for item in self.data.read_file:
                 for key, value in item.items():
-                    if key == "Website" and selected_value in value:
-                        self.website_show = item["Website"]
+                    if key == "Website/URL" and selected_value in value:
+                        self.website_show = item["Website/URL"]
                         self.user_show = item["Email/Username"]
                         self.pw_show = item["Password"]
                         self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
@@ -183,7 +186,7 @@ class WindowGUI(tk.Frame):
         label_load_filedata = tk.Label(self.show_window, text="Load Filedata: ", bg="black", fg="white")
         label_load_filedata.grid(row=0, column=0, padx=0, pady=4)
 
-        label_text_website = Label(self.show_window, text="Website: ", bg=BLACK, fg=WHITE)
+        label_text_website = Label(self.show_window, text="Website/URL: ", bg=BLACK, fg=WHITE)
         label_text_website.grid(row=1, column=0)
 
         label_text_user = Label(self.show_window, text="Email/Username: ", bg=BLACK, fg=WHITE)
@@ -197,6 +200,9 @@ class WindowGUI(tk.Frame):
 
         data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_pw, bg=BLACK, fg=WHITE, width=4)
         data_load_copy_pw.grid(row=3, column=2)
+
+        data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_website, bg=BLACK, fg=WHITE, width=4)
+        data_load_copy_pw.grid(row=1, column=2)
 
         self.show_window.mainloop()
 

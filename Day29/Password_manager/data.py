@@ -34,13 +34,13 @@ class Data:
                                  message="The data could not be saved. Please fill out all entries.")
             return
         response = messagebox.askokcancel(title="Are you sure you want to save?",
-                                          message=f"These are the details you entered: \n\nWebsite: "
-                                                  f"{website} \nEmail: {user} "
+                                          message=f"These are the details you entered: \n\nWebsite/URL: "
+                                                  f"{website} \nEmail/Username: {user} "
                                                   f"\nPassword: {password} \n\nIs it ok to save?")
         if response:
             try:
                 json_encrypt_pw = password_encrypt.decode("'utf-8")
-                new_entry = {"Website": website, "Email/Username": user, "Password": json_encrypt_pw}
+                new_entry = {"Website/URL": website, "Email/Username": user, "Password": json_encrypt_pw}
                 if not self.json_data_path:
                     self.open_json_file()
                 self.read_file.append(new_entry)
@@ -51,10 +51,7 @@ class Data:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
 
     def load_website_options(self):
-        key = "Website"
+        key = "Website/URL"
         for item in self.read_file:
             if key in item:
                 self.website_option.append(item[key])
-
-
-
