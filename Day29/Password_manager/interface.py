@@ -1,9 +1,10 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter import *
 from tools import PasswordTools
 from data import Data
 import pyperclip
+import json
 
 BLACK = "black"
 WHITE = "white"
@@ -11,6 +12,11 @@ WHITE = "white"
 class WindowGUI(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.website_show = ""
+        self.user_show = ""
+        self.pw_show = ""
+        self.encrypted_pw = None
+        self.selected_item = None
 
         self.parent = parent
         self.parent.title("Password Manager")
@@ -99,7 +105,8 @@ class WindowGUI(tk.Frame):
         website = self.entry_website.get()
         user = self.entry_user.get()
         pw = self.entry_pw.get()
-        self.data.save_data(website, user, pw, self.tools.encrypted_pw)
+        # self.data.save_data(website, user, pw, self.tools.encrypted_pw)
+        self.messagebox_save_file(website, user, pw, self.tools.encrypted_pw)
         self.entry_website.delete(0, END)
         self.entry_pw.delete(0, END)
 
@@ -125,13 +132,8 @@ class WindowGUI(tk.Frame):
         self.parent.after(500, self.check_status)
 
     def show_data_window(self):
-        self.website_show = ""
-        self.user_show = ""
-        self.pw_show = ""
-        self.encrypted_pw = None
-
         def delete_data():
-            None
+            self.data.delete_item(self.selected_item)
 
         def insert_text():
             text_website.configure(state="normal")
@@ -179,6 +181,7 @@ class WindowGUI(tk.Frame):
                         self.website_show = item["Website/URL"]
                         self.user_show = item["Email/Username"]
                         self.pw_show = item["Password"]
+                        self.selected_item = item
                         self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
                         insert_text()
 
@@ -211,3 +214,38 @@ class WindowGUI(tk.Frame):
         data_load_delete_item.grid(row=4, column=2)
 
         self.show_window.mainloop()
+
+    def messagebox_save_file(self, website, user, password, password_encrypt):
+        try:
+            if not all([website, user, password, password_encrypt]):
+                messagebox.showerror(title="Error!",
+                                     message="The data could not be saved. Please fill out all entries.")
+                return
+            response = messagebox.askokcancel(title="Are you sure you want to save?",
+                                              message=f"These are the details you entered: \n\nWebsite/URL: "
+                                                      f"{website} \nEmail/Username: {user} "
+                                                      f"\nPassword: {password} \n\nIs it ok to save?")
+            if response:
+                json_encrypt_pw = password_encrypt.decode('utf-8')
+                new_entry = {"Website/URL": website, "Email/Username": user, "Password": json_encrypt_pw}
+                self.data.save_data(new_entry, self.data.read_file)
+                messagebox.showinfo(title="Success!", message="Data saved successfully.")
+        except Exception as e:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
+
+    def messagebox_open_json(self):
+            try:
+                self.data.open_json_file()
+                messagebox.showinfo(title="Success!", message="File loaded successfully.")
+            except FileNotFoundError:
+                messagebox.showinfo(title="Error!", message="File not found.")
+            except json.JSONDecodeError:
+                messagebox.showinfo(title="Error!", message="Could not decode JSON.")
+            except Exception as e:
+                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+
+
+
+
+
