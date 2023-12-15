@@ -5,8 +5,8 @@ import os
 class Data:
     def __init__(self):
         self.load_items = []
-        self.json_data_path = None
-        self.key_path = None
+        self.json_data_path = ""
+        self.key_path = ""
         self.read_file = []
         self.website_option = []
         self.rdy_to_save = False
@@ -35,19 +35,21 @@ class Data:
         self.read_file = [item for item in self.read_file if item != item_to_delete]
         self.save_data(None, self.read_file)
 
-    def open_file_key(self):
-        self.key_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
-        if self.key_path:
-            with open(self.key_path, "r") as file:
-                passkey = os.path.abspath(self.key_path)
-            if len(passkey) == 32:
-                print(passkey)
-                return passkey
-            else:
-                raise ValueError("Ungültiger Schlüssel")
-
-    def save_key(self, key_encrypt):
-        # json_encrypt_key = key_encrypt.decode('utf-8')
-        with open(self.key_path, "wb") as file:
-            file.write(key_encrypt)
+    # def open_file_key(self):
+    #     self.key_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
+    #     if self.key_path:
+    #         with open(self.key_path, "r") as file:
+    #             passkey = os.path.abspath(self.key_path)
+    #             byte_format_password = passkey.encode('utf-8')
+    #         # if len(byte_format_password) == 32:
+    #             print(byte_format_password)
+    #             return byte_format_password
+    #         # else:
+    #         #     raise ValueError("Ungültiger Schlüssel")
+    #
+    # def save_key(self, key_encrypt):
+    #     if key_encrypt is not None:
+    #         encrypt_key = key_encrypt.decode('utf-8')
+    #         with open(self.key_path, "w") as file:
+    #             file.write(encrypt_key)
 

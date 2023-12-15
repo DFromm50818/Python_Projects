@@ -1,5 +1,4 @@
 from random import randint, choice, shuffle
-from tkinter import filedialog
 import pyperclip
 from cryptography.fernet import Fernet
 import string
@@ -9,7 +8,7 @@ class PasswordTools:
         self.light = "grey"
         self.pw_user = ""
         self.encrypted_pw = None
-        self.key = Fernet.generate_key()
+        self.key = None#Fernet.generate_key()
         self.cipher_suite = Fernet(b'L7CRVk_CnF40i9exhmYzS397F-XGYvNh0QJ2fi5O4GU=')
 
     def password_check(self, password):
@@ -48,6 +47,12 @@ class PasswordTools:
 
     def insert_key(self, key):
         self.cipher_suite = Fernet(key)
+
+    # def generate_key(self):
+    #     key = Fernet.generate_key()
+    #     print(key)
+    #     return key
+
 
 
 

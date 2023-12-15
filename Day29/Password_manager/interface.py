@@ -82,13 +82,14 @@ class WindowGUI(tk.Frame):
         self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
         self.button_show_item_in_file.grid(row=1, column=2)
 
-        self.button_load_key = Button(self.parent, text="Load Key", command=self.messagebox_open_key, bg=BLACK, fg=WHITE, width=15)
-        self.button_load_key.grid(row=0, column=0)
-
-        self.button_save_key = Button(self.parent, text="Save Key", command=self.data.save_key(self.tools.key), bg=BLACK,
-                                      fg=WHITE, width=15)
-        self.button_save_key.grid(row=0, column=2)
-
+        # self.button_load_key = Button(self.parent, text="Load Key", command=self.messagebox_open_key, bg=BLACK, fg=WHITE, width=15)
+        # self.button_load_key.grid(row=0, column=0)
+        #
+        # self.button_save_key = Button(self.parent, text="Save Key", command=lambda: self.data.save_key(self.tools.key), bg=BLACK, fg=WHITE, width=15)
+        # self.button_save_key.grid(row=0, column=2)
+        #
+        # self.button_generate_key = Button(self.parent, text="Generate Key", command=lambda: self.generate_key_button, bg=BLACK, fg=WHITE, width=15)
+        # self.button_generate_key.grid(row=0, column=1)
 
     # def close_slave_window(self):
     #     self.show_window.destroy()
@@ -252,18 +253,23 @@ class WindowGUI(tk.Frame):
             except Exception as error:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def messagebox_open_key(self):
-        encrypt_key = self.data.open_file_key()
-        if encrypt_key:
-            try:
-                byte_format_password = encrypt_key.encode('utf-8')
-                self.tools.insert_key(byte_format_password)
-                print(byte_format_password)
-            except Exception as e:
-                print("Fehler beim Laden des Schlüssels:", e)
-                return None
+    # def messagebox_open_key(self):
+    #     encrypt_key = self.data.open_file_key()
+    #     if encrypt_key:
+    #         try:
+    #             # byte_format_password = encrypt_key.encode('utf-8')
+    #             self.tools.insert_key(encrypt_key)
+    #             print(encrypt_key)
+    #         except Exception as e:
+    #             print("Fehler beim Laden des Schlüssels:", e)
+    #             return None
+    #
+    # # def messagebox_save_key(self):
+    # def generate_key_button(self):
+    #     key = self.tools.insert_key(self.tools.generate_key())
+    #     self.data.save_key(key)
 
-    # def messagebox_save_key(self):
+
 
 
 
