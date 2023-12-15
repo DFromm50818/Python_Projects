@@ -76,7 +76,7 @@ class WindowGUI(tk.Frame):
         self.label_secure = Label(text="Password\nsecure?", bg=BLACK, fg=WHITE)
         self.label_secure.grid(row=5, column=0)
 
-        self.button_load_file = Button(self.parent, text="Load File", command=self.data.open_json_file, bg=BLACK, fg=WHITE, width=15)
+        self.button_load_file = Button(self.parent, text="Load File", command=self.messagebox_open_json, bg=BLACK, fg=WHITE, width=15)
         self.button_load_file.grid(row=1, column=1)
 
         self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
@@ -105,7 +105,6 @@ class WindowGUI(tk.Frame):
         website = self.entry_website.get()
         user = self.entry_user.get()
         pw = self.entry_pw.get()
-        # self.data.save_data(website, user, pw, self.tools.encrypted_pw)
         self.messagebox_save_file(website, user, pw, self.tools.encrypted_pw)
         self.entry_website.delete(0, END)
         self.entry_pw.delete(0, END)
@@ -236,12 +235,13 @@ class WindowGUI(tk.Frame):
     def messagebox_open_json(self):
             try:
                 self.data.open_json_file()
-                messagebox.showinfo(title="Success!", message="File loaded successfully.")
+                if self.data.read_file:
+                    messagebox.showinfo(title="Success!", message="File loaded successfully.")
             except FileNotFoundError:
                 messagebox.showinfo(title="Error!", message="File not found.")
             except json.JSONDecodeError:
                 messagebox.showinfo(title="Error!", message="Could not decode JSON.")
-            except Exception as e:
+            except Exception as error:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
 

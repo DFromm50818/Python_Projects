@@ -1,7 +1,12 @@
 [
     {
-        "Website/URL": "HelloKitty",
+        "Website/URL": "HelloFresh",
         "Email/Username": "fromm_daniel@yahoo.de",
-        "Password": "gAAAAABle2h1mvPUaRGHU8PxklWVtw9GYbmrcLPdzLywXg8H01O4KZZa7pLt1N3Fl7vj6JUaYZVhpYjvftnLlQZXKHNgDuVNQIM6Rak2JjO_c0BCV8joogk="
+        "Password": "gAAAAABlfBh0ip4ZYqaaW5PYKoMFuphJoAN_qJfwliq_0DlutzDXTLMpywmrweGEWQXkZaS3JyLl0JnHcTPXaaj_mY0aeJs3MVyrQom4HspT_8ZB2-xI2Og="
+    },
+    {
+        "Website/URL": "EvilKitty",
+        "Email/Username": "fromm_daniel@yahoo.de",
+        "Password": "gAAAAABlfBiBWPGx3FzCSVz5-rBl4X0Hi9FFxN6Fk5HQjgjq9C5a7BaLryxhxyiOld4wlfDWfAOlhk2OXtdJ_Ul-JwdPhVz_ARcUrdNNEz_45vL2pli4s7A="
     }
 ]

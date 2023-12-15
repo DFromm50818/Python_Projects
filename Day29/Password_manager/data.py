@@ -5,7 +5,6 @@ import os
 class Data:
     def __init__(self):
         self.load_items = []
-
         self.json_data_path = ""
         self.read_file = []
         self.website_option = []
@@ -18,17 +17,6 @@ class Data:
                 self.json_data_path = os.path.abspath(file_path)
                 self.read_file = json.load(file)
             self.load_website_options()
-            if self.read_file:
-                
-
-            # try:
-            #     messagebox.showinfo(title="Success!", message="File loaded successfully.")
-            # except FileNotFoundError:
-            #     messagebox.showinfo(title="Error!", message="File not found.")
-            # except json.JSONDecodeError:
-            #     messagebox.showinfo(title="Error!", message="Could not decode JSON.")
-            # except Exception as e:
-            #     messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
 
     def save_data(self, new_item, file):
         if not self.json_data_path:
