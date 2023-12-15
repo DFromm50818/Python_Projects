@@ -5,7 +5,8 @@ import os
 class Data:
     def __init__(self):
         self.load_items = []
-        self.json_data_path = ""
+        self.json_data_path = None
+        self.key_path = None
         self.read_file = []
         self.website_option = []
         self.rdy_to_save = False
@@ -33,3 +34,20 @@ class Data:
     def delete_item(self, item_to_delete):
         self.read_file = [item for item in self.read_file if item != item_to_delete]
         self.save_data(None, self.read_file)
+
+    def open_file_key(self):
+        self.key_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
+        if self.key_path:
+            with open(self.key_path, "r") as file:
+                passkey = os.path.abspath(self.key_path)
+            if len(passkey) == 32:
+                print(passkey)
+                return passkey
+            else:
+                raise ValueError("Ungültiger Schlüssel")
+
+    def save_key(self, key_encrypt):
+        # json_encrypt_key = key_encrypt.decode('utf-8')
+        with open(self.key_path, "wb") as file:
+            file.write(key_encrypt)
+

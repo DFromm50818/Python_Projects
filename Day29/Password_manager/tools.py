@@ -1,4 +1,5 @@
 from random import randint, choice, shuffle
+from tkinter import filedialog
 import pyperclip
 from cryptography.fernet import Fernet
 import string
@@ -45,15 +46,9 @@ class PasswordTools:
         byte_format_password = encrypt_pw.encode('utf-8')
         return self.cipher_suite.decrypt(byte_format_password)
 
-    # def open_file_key(self):
-    #     try:
-    #         key_file = filedialog.askopenfilename(filetypes=[("DAT files", "*.dat")])
-    #         with open(key_file, "rb") as file:
-    #             passkey = file.read()
-    #         if len(passkey) == 32:  # Stelle sicher, dass der Schlüssel die richtige Länge hat
-    #             return passkey
-    #         else:
-    #             raise ValueError("Ungültiger Schlüssel")
-    #     except Exception as e:
-    #         print("Fehler beim Laden des Schlüssels:", e)
-    #         return None
+    def insert_key(self, key):
+        self.cipher_suite = Fernet(key)
+
+
+
+
