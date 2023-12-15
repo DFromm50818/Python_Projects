@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, filedialog
 from tkinter import *
 from tools import PasswordTools
 from data import Data
@@ -82,6 +82,8 @@ class WindowGUI(tk.Frame):
         self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
         self.button_show_item_in_file.grid(row=1, column=2)
 
+        # self.start_up_load_key()
+
         # self.button_load_key = Button(self.parent, text="Load Key", command=self.messagebox_open_key, bg=BLACK, fg=WHITE, width=15)
         # self.button_load_key.grid(row=0, column=0)
         #
@@ -91,6 +93,8 @@ class WindowGUI(tk.Frame):
         # self.button_generate_key = Button(self.parent, text="Generate Key", command=lambda: self.generate_key_button, bg=BLACK, fg=WHITE, width=15)
         # self.button_generate_key.grid(row=0, column=1)
 
+
+
     # def close_slave_window(self):
     #     self.show_window.destroy()
     #
@@ -98,6 +102,12 @@ class WindowGUI(tk.Frame):
     #     if self.show_window.winfo_exists():
     #         self.show_window.destroy()
     #     self.parent.destroy()
+
+    # def start_up_load_key(self):
+    #     if self.data.key_path is None:
+    #         self.data.load_key_from_file()
+            # self.tools.insert_key(self.data.load_key_from_file())
+            # self.data.save_key_to_file(self.data.key_path, self.tools.generate_key())
 
     def check_open_file(self):
         if len(self.data.json_data_path) == 0:

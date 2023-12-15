@@ -8,7 +8,7 @@ class PasswordTools:
         self.light = "grey"
         self.pw_user = ""
         self.encrypted_pw = None
-        self.key = None#Fernet.generate_key()
+        self.key = Fernet.generate_key()
         self.cipher_suite = Fernet(b'L7CRVk_CnF40i9exhmYzS397F-XGYvNh0QJ2fi5O4GU=')
 
     def password_check(self, password):
@@ -45,9 +45,9 @@ class PasswordTools:
         byte_format_password = encrypt_pw.encode('utf-8')
         return self.cipher_suite.decrypt(byte_format_password)
 
-    def insert_key(self, key):
-        self.cipher_suite = Fernet(key)
-
+    # def insert_key(self, key):
+    #     self.cipher_suite = Fernet(key)
+    #
     # def generate_key(self):
     #     key = Fernet.generate_key()
     #     print(key)

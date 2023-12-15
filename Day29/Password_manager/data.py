@@ -1,12 +1,15 @@
-from tkinter import filedialog, messagebox
+import base64
+from tkinter import filedialog
 import json
 import os
+# from cryptography.fernet import Fernet
 
 class Data:
     def __init__(self):
         self.load_items = []
         self.json_data_path = ""
-        self.key_path = ""
+        self.key_path = None
+        self.key = None
         self.read_file = []
         self.website_option = []
         self.rdy_to_save = False
@@ -53,3 +56,36 @@ class Data:
     #         with open(self.key_path, "w") as file:
     #             file.write(encrypt_key)
 
+    # def save_key_to_file(self, file_path, key):
+    #     if key:
+    #         with open(file_path, 'wb') as file:
+    #             file.write(key)
+    #         print("Key has been saved successfully.")
+    #     else:
+    #         print("No key to save.")
+    #
+    # def load_key_from_file(self):
+    #     try:
+    #         self.key_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
+    #         with open(self.key_path, 'rb') as file:
+    #             self.key = file.read()
+    #             if len(self.key) == 32 and base64.urlsafe_b64encode(self.key) == self.key:
+    #                 print("Key has been loaded successfully.")
+    #                 self.cipher_suite = Fernet(self.key)
+    #                 return self.key
+    #             else:
+    #                 print("Loaded key is not in the correct format.")
+    #     except FileNotFoundError:
+    #         print("File not found.")
+    #     except Exception as error:
+    #         print(f"An error occurred while loading the key: {error}")
+
+# # Beispiel der Verwendung
+#
+# key_manager.generate_key()
+#
+# # Speichern des Schlüssels
+# key_manager.save_key_to_file("my_key.bin")
+#
+# # Laden des Schlüssels
+# key_manager.load_key_from_file("my_key.bin")
