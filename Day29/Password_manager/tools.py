@@ -44,16 +44,3 @@ class PasswordTools:
     def decrypt_password(self, encrypt_pw):
         byte_format_password = encrypt_pw.encode('utf-8')
         return self.cipher_suite.decrypt(byte_format_password)
-
-    # def insert_key(self, key):
-    #     self.cipher_suite = Fernet(key)
-    #
-    # def generate_key(self):
-    #     key = Fernet.generate_key()
-    #     print(key)
-    #     return key
-
-
-
-
-

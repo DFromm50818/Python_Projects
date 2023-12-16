@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, filedialog
+from tkinter import ttk, messagebox
 from tkinter import *
 from tools import PasswordTools
 from data import Data
@@ -9,6 +9,19 @@ import json
 BLACK = "black"
 WHITE = "white"
 
+# ██████╗  █████╗ ██████╗ ███████╗███╗   ██╗████████╗
+# ██╔══██╗██╔══██╗██╔══██╗██╔════╝████╗  ██║╚══██╔══╝
+# ██████╔╝███████║██████╔╝█████╗  ██╔██╗ ██║   ██║
+# ██╔═══╝ ██╔══██║██╔══██╗██╔══╝  ██║╚██╗██║   ██║
+# ██║     ██║  ██║██║  ██║███████╗██║ ╚████║   ██║
+# ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝
+# .______      ___      .______       _______ .__   __. .___________.
+# |   _  \    /   \     |   _  \     |   ____||  \ |  | |           |
+# |  |_)  |  /  ^  \    |  |_)  |    |  |__   |   \|  | `---|  |----`
+# |   ___/  /  /_\  \   |      /     |   __|  |  . `  |     |  |
+# |  |     /  _____  \  |  |\  \----.|  |____ |  |\   |     |  |
+# | _|    /__/     \__\ | _| `._____||_______||__| \__|     |__|
+
 class WindowGUI(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -17,20 +30,21 @@ class WindowGUI(tk.Frame):
         self.pw_show = ""
         self.encrypted_pw = None
         self.selected_item = None
-
         self.parent = parent
         self.parent.title("Password Manager")
         self.parent.config(padx=50, pady=50, bg=BLACK)
-        # self.parent.protocol("WM_DELETE_WINDOW", self.on_closing_main_window)
 
         self.websites = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
 
-        self.canvas = Canvas(width=200, height=200, bg=BLACK, highlightthickness=0)
+        self.primary_window()
+
+    def primary_window(self):
+        self.canvas = Canvas(self.parent, width=200, height=200, bg=BLACK, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
         self.canvas.create_image(100, 100, image=self.picture_png)
-        self.canvas.grid(row=0, column=1)
+        self.canvas.grid(row=0, column=0)
 
         self.entry_website = tk.Entry(self.parent, width=52)
         self.entry_website.grid(row=2, column=1, columnspan=2)
@@ -55,8 +69,7 @@ class WindowGUI(tk.Frame):
         self.label_pw.grid(row=4, column=0)
         self.label_pw.config(padx=0, pady=3)
 
-        self.button_gen_pw = Button(self.parent, width=44, text="Generate Password", command=self.insert_pw_entry,
-                               bg=BLACK, fg=WHITE)
+        self.button_gen_pw = Button(self.parent, width=44, text="Generate Password", command=self.insert_pw_entry, bg=BLACK, fg=WHITE)
         self.button_gen_pw.grid(row=5, column=1, columnspan=2)
 
         self.button_add = Button(self.parent, width=44, text="Add Entries", command=self.collect_entries, bg=BLACK, fg=WHITE)
@@ -70,7 +83,7 @@ class WindowGUI(tk.Frame):
 
         self.canvas_oval = Canvas(width=20, height=20, bg=BLACK, highlightthickness=0)
         self.canvas_oval.create_oval(1, 1, 19, 19, outline="black", fill="grey")
-        self.canvas_oval.grid(row=7, column=0)
+        self.canvas_oval.grid(row=6, column=0)
         self.check_status()
 
         self.label_secure = Label(text="Password\nsecure?", bg=BLACK, fg=WHITE)
@@ -81,33 +94,6 @@ class WindowGUI(tk.Frame):
 
         self.button_show_item_in_file = Button(self.parent, text="Show Item in File", command=self.check_open_file, bg=BLACK, fg=WHITE, width=15)
         self.button_show_item_in_file.grid(row=1, column=2)
-
-        # self.start_up_load_key()
-
-        # self.button_load_key = Button(self.parent, text="Load Key", command=self.messagebox_open_key, bg=BLACK, fg=WHITE, width=15)
-        # self.button_load_key.grid(row=0, column=0)
-        #
-        # self.button_save_key = Button(self.parent, text="Save Key", command=lambda: self.data.save_key(self.tools.key), bg=BLACK, fg=WHITE, width=15)
-        # self.button_save_key.grid(row=0, column=2)
-        #
-        # self.button_generate_key = Button(self.parent, text="Generate Key", command=lambda: self.generate_key_button, bg=BLACK, fg=WHITE, width=15)
-        # self.button_generate_key.grid(row=0, column=1)
-
-
-
-    # def close_slave_window(self):
-    #     self.show_window.destroy()
-    #
-    # def on_closing_main_window(self):
-    #     if self.show_window.winfo_exists():
-    #         self.show_window.destroy()
-    #     self.parent.destroy()
-
-    # def start_up_load_key(self):
-    #     if self.data.key_path is None:
-    #         self.data.load_key_from_file()
-            # self.tools.insert_key(self.data.load_key_from_file())
-            # self.data.save_key_to_file(self.data.key_path, self.tools.generate_key())
 
     def check_open_file(self):
         if len(self.data.json_data_path) == 0:
@@ -262,29 +248,3 @@ class WindowGUI(tk.Frame):
                 messagebox.showinfo(title="Error!", message="Could not decode JSON.")
             except Exception as error:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
-
-    # def messagebox_open_key(self):
-    #     encrypt_key = self.data.open_file_key()
-    #     if encrypt_key:
-    #         try:
-    #             # byte_format_password = encrypt_key.encode('utf-8')
-    #             self.tools.insert_key(encrypt_key)
-    #             print(encrypt_key)
-    #         except Exception as e:
-    #             print("Fehler beim Laden des Schlüssels:", e)
-    #             return None
-    #
-    # # def messagebox_save_key(self):
-    # def generate_key_button(self):
-    #     key = self.tools.insert_key(self.tools.generate_key())
-    #     self.data.save_key(key)
-
-
-
-
-
-
-
-
-
-
