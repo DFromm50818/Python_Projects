@@ -3,6 +3,7 @@ import pyperclip
 from cryptography.fernet import Fernet
 import string
 
+
 class PasswordTools:
     def __init__(self):
         self.light = "grey"

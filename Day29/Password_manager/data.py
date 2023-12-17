@@ -2,6 +2,7 @@ from tkinter import filedialog
 import json
 import os
 
+
 class Data:
     def __init__(self):
         self.file_path = ""
