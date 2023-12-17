@@ -105,7 +105,7 @@ class WindowGUI(tk.Frame):
         self.button_load_file = Button(self.frame1, text="Load File", command=self.messagebox_open_json, width=15)
         self.button_load_file.pack(side="left", fill='x')
 
-        self.button_show_item_in_file = Button(self.frame1, text="Show Item in File", command=self.check_open_file, width=15)
+        self.button_show_item_in_file = Button(self.frame1, text="Show Items in File", command=self.check_open_file, width=15)
         self.button_show_item_in_file.pack(side="left", fill='x')
 
     def secondary_window(self):
@@ -113,44 +113,42 @@ class WindowGUI(tk.Frame):
         self.show_window.title("Load Item Data")
         self.show_window.config(padx=50, pady=50, bg=BLACK)
 
-        text_website = Text(self.show_window, wrap="word", height=1, width=52)
-        text_website.pack(side='top', fill='x')
+        self.text_website = Text(self.show_window, wrap="word", height=1, width=52)
+        self.text_website.pack(side='top', fill='x')
 
-        text_user = Text(self.show_window, wrap="word", height=1, width=52)
-        text_user.pack(side='top', fill='x')
+        self.text_user = Text(self.show_window, wrap="word", height=1, width=52)
+        self.text_user.pack(side='top', fill='x')
 
-        text_pw = Text(self.show_window, wrap="word", height=1, width=52)
-        text_pw.pack(side='top', fill='x')
+        self.text_pw = Text(self.show_window, wrap="word", height=1, width=52)
+        self.text_pw.pack(side='top', fill='x')
 
-        combobox = ttk.Combobox(self.show_window, width=48, values=self.data.website_option)
-        combobox.pack(side='top', fill='y')
-        combobox.bind("<<ComboboxSelected>>", on_combobox_select)
+        self.combobox = ttk.Combobox(self.show_window, width=48, values=self.data.website_option)
+        self.combobox.pack(side='top', fill='y')
+        self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
 
-        label_load_filedata = tk.Label(self.show_window, text="Load Filedata: ", bg="black", fg="white")
-        label_load_filedata.pack(side='bottom')
+        self.label_load_filedata = tk.Label(self.show_window, text="Load Filedata: ", bg="black", fg="white")
+        self.label_load_filedata.pack(side='bottom')
 
-        label_text_website = Label(self.show_window, text="Website/URL: ", bg=BLACK, fg=WHITE)
-        label_text_website.pack(side='left')
+        self.label_text_website = Label(self.show_window, text="Website/URL: ", bg=BLACK, fg=WHITE)
+        self.label_text_website.pack(side='left')
 
-        label_text_user = Label(self.show_window, text="Email/Username: ", bg=BLACK, fg=WHITE)
-        label_text_user.pack(side='left')
+        self.label_text_user = Label(self.show_window, text="Email/Username: ", bg=BLACK, fg=WHITE)
+        self.label_text_user.pack(side='left')
 
-        label_text_pw = Label(self.show_window, text="Password: ", bg=BLACK, fg=WHITE)
-        label_text_pw.pack(side='left')
+        self.label_text_pw = Label(self.show_window, text="Password: ", bg=BLACK, fg=WHITE)
+        self.label_text_pw.pack(side='left')
 
-        data_load_copy_user = Button(self.show_window, text="Copy", command=copy_text_user, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_user.pack(side='left')
+        self.data_load_copy_user = Button(self.show_window, text="Copy", command=self.copy_text_user, bg=BLACK, fg=WHITE, width=4)
+        self.data_load_copy_user.pack(side='left')
 
-        data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_pw, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_pw.pack(side='left')
+        self.data_load_copy_pw = Button(self.show_window, text="Copy", command=self.copy_text_pw, bg=BLACK, fg=WHITE, width=4)
+        self.data_load_copy_pw.pack(side='left')
 
-        data_load_copy_pw = Button(self.show_window, text="Copy", command=copy_text_website, bg=BLACK, fg=WHITE, width=4)
-        data_load_copy_pw.pack(side='left')
+        self.data_load_copy_pw = Button(self.show_window, text="Copy", command=self.copy_text_website, bg=BLACK, fg=WHITE, width=4)
+        self.data_load_copy_pw.pack(side='left')
 
-        data_load_delete_item = Button(self.show_window, text="Delete Item", command=delete_data, bg=BLACK, fg=WHITE, width=4)
-        data_load_delete_item.pack(side='left')
-
-        show_window.mainloop()
+        self.data_load_delete_item = Button(self.show_window, text="Delete Item", command=self.delete_data, bg=BLACK, fg=WHITE, width=4)
+        self.data_load_delete_item.pack(side='left')
 
     def messagebox_save_file(self, website, user, password, password_encrypt):
         try:
@@ -169,7 +167,6 @@ class WindowGUI(tk.Frame):
                 messagebox.showinfo(title="Success!", message="Data saved successfully.")
         except Exception as e:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
-
 
     def messagebox_open_json(self):
             try:
@@ -193,12 +190,12 @@ class WindowGUI(tk.Frame):
                     self.pw_show = item["Password"]
                     self.selected_item = item
                     self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
-                    insert_text()
+                    self.insert_text()
 
     def check_open_file(self):
         if len(self.data.json_data_path) == 0:
             self.data.open_json_file()
-        self.show_data_window()
+        self.secondary_window()
 
     def copy_pw(self):
         pyperclip.copy(self.entry_pw.get())
@@ -236,31 +233,31 @@ class WindowGUI(tk.Frame):
         self.parent.after(500, self.check_status)
 
     def copy_text_website(self):
-        pyperclip.copy(self.show_data_window.text_website.get("1.0", "end-1c"))
+        pyperclip.copy(self.text_website.get("1.0", "end-1c"))
 
     def copy_text_user(self):
-        pyperclip.copy(self.show_data_window.text_user.get("1.0", "end-1c"))
+        pyperclip.copy(self.text_user.get("1.0", "end-1c"))
 
     def copy_text_pw(self):
-        pyperclip.copy(self.show_data_window.text_pw.get("1.0", "end-1c"))
+        pyperclip.copy(self.text_pw.get("1.0", "end-1c"))
 
     def delete_data(self):
         self.data.delete_item(self.selected_item)
 
     def insert_text(self):
-        text_website.configure(state="normal")
-        text_user.configure(state="normal")
-        text_pw.configure(state="normal")
+        self.text_website.configure(state="normal")
+        self.text_user.configure(state="normal")
+        self.text_pw.configure(state="normal")
 
-        if len(text_website.get("1.0", "end-1c")) > 0:
-            text_website.delete("1.0", END)
-            text_user.delete("1.0", END)
-            text_pw.delete("1.0", END)
+        if len(self.text_website.get("1.0", "end-1c")) > 0:
+            self.text_website.delete("1.0", END)
+            self.text_user.delete("1.0", END)
+            self.text_pw.delete("1.0", END)
 
-        text_website.insert(END, self.website_show)
-        text_user.insert(END, self.user_show)
-        text_pw.insert(END, self.encrypted_pw)
+        self.text_website.insert(END, self.website_show)
+        self.text_user.insert(END, self.user_show)
+        self.text_pw.insert(END, self.encrypted_pw)
 
-        text_website.configure(state="disabled")
-        text_user.configure(state="disabled")
-        text_pw.configure(state="disabled")
+        self.text_website.configure(state="disabled")
+        self.text_user.configure(state="disabled")
+        self.text_pw.configure(state="disabled")
