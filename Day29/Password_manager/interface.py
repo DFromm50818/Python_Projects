@@ -99,59 +99,30 @@ class WindowGUI(tk.Frame):
         self.label_save_all = Label(self.frame6, text="Save all entries?")
         self.label_save_all.pack(side="left", fill="x")
 
-        self.button_add = Button(self.frame6, width=44, text="Add Entries", command=self.collect_entries)
+        self.button_add = Button(self.frame6, width=44, text="Add Entries", command=self.save_entries)
         self.button_add.pack(side="left", fill='x')
 
-        self.button_load_file = Button(self.frame1, text="Load File", command=self.messagebox_open_json, width=15)
+        self.button_load_file = Button(self.frame1, text="Load File", command=self.open_json, width=15)
         self.button_load_file.pack(side="left", fill='x')
 
-        self.button_show_item_in_file = Button(self.frame1, text="Show Items in File", command=self.check_open_file, width=15)
-        self.button_show_item_in_file.pack(side="left", fill='x')
-
-    def secondary_window(self):
-        self.show_window = Tk()
-        self.show_window.title("Load Item Data")
-        self.show_window.config(padx=50, pady=50, bg=BLACK)
-
-        self.text_website = Text(self.show_window, wrap="word", height=1, width=52)
-        self.text_website.pack(side='top', fill='x')
-
-        self.text_user = Text(self.show_window, wrap="word", height=1, width=52)
-        self.text_user.pack(side='top', fill='x')
-
-        self.text_pw = Text(self.show_window, wrap="word", height=1, width=52)
-        self.text_pw.pack(side='top', fill='x')
-
-        self.combobox = ttk.Combobox(self.show_window, width=48, values=self.data.website_option)
+        self.combobox = ttk.Combobox(self.frame0, width=48, values=self.data.website_option)
         self.combobox.pack(side='top', fill='y')
         self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
 
-        self.label_load_filedata = tk.Label(self.show_window, text="Load Filedata: ", bg="black", fg="white")
-        self.label_load_filedata.pack(side='bottom')
-
-        self.label_text_website = Label(self.show_window, text="Website/URL: ", bg=BLACK, fg=WHITE)
-        self.label_text_website.pack(side='left')
-
-        self.label_text_user = Label(self.show_window, text="Email/Username: ", bg=BLACK, fg=WHITE)
-        self.label_text_user.pack(side='left')
-
-        self.label_text_pw = Label(self.show_window, text="Password: ", bg=BLACK, fg=WHITE)
-        self.label_text_pw.pack(side='left')
-
-        self.data_load_copy_user = Button(self.show_window, text="Copy", command=self.copy_text_user, bg=BLACK, fg=WHITE, width=4)
-        self.data_load_copy_user.pack(side='left')
-
-        self.data_load_copy_pw = Button(self.show_window, text="Copy", command=self.copy_text_pw, bg=BLACK, fg=WHITE, width=4)
-        self.data_load_copy_pw.pack(side='left')
-
-        self.data_load_copy_pw = Button(self.show_window, text="Copy", command=self.copy_text_website, bg=BLACK, fg=WHITE, width=4)
-        self.data_load_copy_pw.pack(side='left')
-
-        self.data_load_delete_item = Button(self.show_window, text="Delete Item", command=self.delete_data, bg=BLACK, fg=WHITE, width=4)
+        self.data_load_delete_item = Button(self.frame1, text="Delete Item", command=self.delete_data, width=4)
         self.data_load_delete_item.pack(side='left')
 
-    def messagebox_save_file(self, website, user, password, password_encrypt):
+    def update_combobox(self):
+        self.data.load_website_options()
+        new_websites = self.data.website_option
+        self.combobox["values"] = new_websites
+
+    def save_entries(self):
         try:
+            website = self.entry_website.get()
+            user = self.entry_user.get()
+            password = self.entry_pw.get()
+            password_encrypt = self.tools.encrypted_pw
             if not all([website, user, password, password_encrypt]):
                 messagebox.showerror(title="Error!",
                                      message="The data could not be saved. Please fill out all entries.")
@@ -165,14 +136,18 @@ class WindowGUI(tk.Frame):
                 new_entry = {"Website/URL": website, "Email/Username": user, "Password": json_encrypt_pw}
                 self.data.save_data(new_entry, self.data.read_file)
                 messagebox.showinfo(title="Success!", message="Data saved successfully.")
-        except Exception as e:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {e}")
+                self.update_combobox()
+                self.entry_website.delete(0, END)
+                self.entry_pw.delete(0, END)
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def messagebox_open_json(self):
+    def open_json(self):
             try:
                 self.data.open_json_file()
                 if self.data.read_file:
                     messagebox.showinfo(title="Success!", message="File loaded successfully.")
+                    self.update_combobox()
             except FileNotFoundError:
                 messagebox.showinfo(title="Error!", message="File not found.")
             except json.JSONDecodeError:
@@ -190,26 +165,13 @@ class WindowGUI(tk.Frame):
                     self.pw_show = item["Password"]
                     self.selected_item = item
                     self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
-                    self.insert_text()
-
-    def check_open_file(self):
-        if len(self.data.json_data_path) == 0:
-            self.data.open_json_file()
-        self.secondary_window()
+                    self.insert_text(self.website_show, self.user_show, self.encrypted_pw)
 
     def copy_pw(self):
         pyperclip.copy(self.entry_pw.get())
 
     def copy_user(self):
         pyperclip.copy(self.entry_user.get())
-
-    def collect_entries(self):
-        website = self.entry_website.get()
-        user = self.entry_user.get()
-        pw = self.entry_pw.get()
-        self.messagebox_save_file(website, user, pw, self.tools.encrypted_pw)
-        self.entry_website.delete(0, END)
-        self.entry_pw.delete(0, END)
 
     def insert_pw_entry(self):
         self.entry_pw.delete(0, END)
@@ -232,32 +194,15 @@ class WindowGUI(tk.Frame):
         self.canvas_light_update(light_status)
         self.parent.after(500, self.check_status)
 
-    def copy_text_website(self):
-        pyperclip.copy(self.text_website.get("1.0", "end-1c"))
-
-    def copy_text_user(self):
-        pyperclip.copy(self.text_user.get("1.0", "end-1c"))
-
-    def copy_text_pw(self):
-        pyperclip.copy(self.text_pw.get("1.0", "end-1c"))
-
     def delete_data(self):
         self.data.delete_item(self.selected_item)
+        self.update_combobox()
 
-    def insert_text(self):
-        self.text_website.configure(state="normal")
-        self.text_user.configure(state="normal")
-        self.text_pw.configure(state="normal")
-
-        if len(self.text_website.get("1.0", "end-1c")) > 0:
-            self.text_website.delete("1.0", END)
-            self.text_user.delete("1.0", END)
-            self.text_pw.delete("1.0", END)
-
-        self.text_website.insert(END, self.website_show)
-        self.text_user.insert(END, self.user_show)
-        self.text_pw.insert(END, self.encrypted_pw)
-
-        self.text_website.configure(state="disabled")
-        self.text_user.configure(state="disabled")
-        self.text_pw.configure(state="disabled")
+    def insert_text(self, website, user, password):
+        if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()) != 0:
+            self.entry_website.delete(0, END)
+            self.entry_user.delete(0, END)
+            self.entry_pw.delete(0, END)
+        self.entry_website.insert(END, string=website)
+        self.entry_user.insert(END, string=user)
+        self.entry_pw.insert(END, string=password)

@@ -15,13 +15,11 @@ class Data:
         self.rdy_to_save = False
 
     def open_json_file(self):
-        if len(self.file_path) == 0:
-            self.file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
+        self.file_path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
         if self.file_path:
             with open(self.file_path, "r") as file:
                 self.json_data_path = os.path.abspath(self.file_path)
                 self.read_file = json.load(file)
-            self.load_website_options()
 
     def save_data(self, new_item, file):
         if not self.json_data_path:
@@ -36,6 +34,9 @@ class Data:
         self.website_option = [item[key] for item in self.read_file if key in item]
 
     def delete_item(self, item_to_delete):
-        self.read_file = [item for item in self.read_file if item != item_to_delete]
-        self.save_data(None, self.read_file)
-        self.open_json_file()
+        try:
+            self.read_file = [item for item in self.read_file if item != item_to_delete]
+            self.save_data(None, self.read_file)
+            self.read_file = self.read_file
+        except:
+            return None
