@@ -42,7 +42,7 @@ class WindowGUI(tk.Frame):
         self.entry_website.grid(row=2, column=3, columnspan=2, sticky="w")
         self.entry_website.focus()
 
-        self.label_user = Label(self.parent, text="Email/Username: ", width=20, bg=BLACK, fg=WHITE)
+        self.label_user = Label(self.parent, text="Login: ", width=20, bg=BLACK, fg=WHITE)
         self.label_user.grid(row=3, column=2, sticky="e")
         self.label_user.config(padx=0, pady=3)
 
@@ -73,7 +73,7 @@ class WindowGUI(tk.Frame):
         self.button_gen_pw = Button(self.parent, width=22, text="Generate Password", command=self.insert_pw_entry, bg=BLACK, fg=WHITE)
         self.button_gen_pw.grid(row=5, column=3, sticky="w")
 
-        self.button_add = Button(self.parent, text="Save Item", command=self.save_entries, width=22, bg=BLACK, fg=WHITE)
+        self.button_add = Button(self.parent, text="Save Password", command=self.save_entries, width=22, bg=BLACK, fg=WHITE)
         self.button_add.grid(row=5, column=4, sticky="w")
 
         self.button_load_file = Button(self.parent, text="Load File", command=self.open_json, width=15, bg=BLACK, fg=WHITE)
@@ -83,16 +83,35 @@ class WindowGUI(tk.Frame):
         self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
         self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
 
-        self.data_load_delete_item = Button(self.parent, text="Delete Item", command=self.delete_data, width=15, bg=BLACK, fg=WHITE)
+        self.data_load_delete_item = Button(self.parent, text="Delete Password", command=self.delete_data, width=15, bg=BLACK, fg=WHITE)
         self.data_load_delete_item.grid(row=5, column=1, sticky="e")
 
         self.clear_entries = Button(self.parent, text="Clear Entries", command=self.clear_all_entries, width=15, bg=BLACK, fg=WHITE)
         self.clear_entries.grid(row=3 ,column=1, sticky="e")
 
-        self.label_load_item = Label(self.parent, text="Load Entry in Save ", bg=BLACK, fg=WHITE)
+        self.label_load_item = Label(self.parent, text="Saved Passwords: ", bg=BLACK, fg=WHITE)
         self.label_load_item.grid(row=1, column=2)
 
         self.canvas.lower(self.parent)
+
+        self.menubar = Menu(self.parent)
+        self.filemenu = tk.Menu(self.menubar)
+        self.filemenu.add_command(label="Open", command=self.open_json)
+        # self.filemenu.add_command(label="Save", command=self.save_entries)
+        self.filemenu.add_command(label="Exit", command=self.exit_program)
+        self.menubar.add_cascade(label="Filemenu", menu=self.filemenu)
+        self.parent.config(menu=self.menubar)
+
+    def exit_program(self):
+        if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()):
+            response = messagebox.askokcancel(title="Quit program? ",
+                                              message=f"You have entered some details. Are your sure you want to quit?")
+            if response:
+                exit()
+            else:
+                None
+
+
 
     def update_combobox(self):
         self.data.load_website_options()
@@ -111,11 +130,11 @@ class WindowGUI(tk.Frame):
                 return
             response = messagebox.askokcancel(title="Are you sure you want to save?",
                                               message=f"These are the details you entered: \n\nWebsite/URL: "
-                                                      f"{website} \nEmail/Username: {user} "
+                                                      f"{website} \nLogin: {user} "
                                                       f"\nPassword: {password} \n\nIs it ok to save?")
             if response:
                 json_encrypt_pw = password_encrypt.decode('utf-8')
-                new_entry = {"Website/URL": website, "Email/Username": user, "Password": json_encrypt_pw}
+                new_entry = {"Website/URL": website, "Login": user, "Password": json_encrypt_pw}
                 self.data.save_data(new_entry, self.data.read_file)
                 messagebox.showinfo(title="Success!", message="Data saved successfully.")
                 self.update_combobox()
@@ -143,7 +162,7 @@ class WindowGUI(tk.Frame):
             for key, value in item.items():
                 if key == "Website/URL" and selected_value in value:
                     self.website_show = item["Website/URL"]
-                    self.user_show = item["Email/Username"]
+                    self.user_show = item["Login"]
                     self.pw_show = item["Password"]
                     self.selected_item = item
                     self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
