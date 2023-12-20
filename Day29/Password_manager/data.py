@@ -21,22 +21,19 @@ class Data:
                 self.json_data_path = os.path.abspath(self.file_path)
                 self.read_file = json.load(file)
 
-    def save_data(self, new_item, file):
-        if not self.json_data_path:
-            self.open_json_file()
+    def save_data(self, new_item):
+        # if not self.json_data_path:
+        #     self.open_json_file()
         if new_item is not None:
             self.read_file.append(new_item)
-        with open(self.json_data_path, "w") as read_data:
-            json.dump(file, read_data, indent=4, ensure_ascii=False)
+        with open(self.json_data_path, "w") as wright_data:
+            json.dump(self.read_file, wright_data, indent=4, ensure_ascii=False)
 
     def load_website_options(self):
         key = "Website/URL"
         self.website_option = [item[key] for item in self.read_file if key in item]
 
     def delete_item(self, item_to_delete):
-        try:
-            self.read_file = [item for item in self.read_file if item != item_to_delete]
-            self.save_data(None, self.read_file)
-            self.read_file = self.read_file
-        except:
-            return None
+        self.read_file = [item for item in self.read_file if item != item_to_delete]
+        self.save_data(None)
+        self.read_file = self.read_file

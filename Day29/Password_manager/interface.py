@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter import *
+from ttkthemes import *
 from tools import PasswordTools
 from data import Data
 import pyperclip
@@ -8,6 +9,7 @@ import json
 
 BLACK = "black"
 WHITE = "white"
+THEME = "equilux"
 
 
 class WindowGUI(tk.Frame):
@@ -20,87 +22,85 @@ class WindowGUI(tk.Frame):
         self.selected_item = None
         self.parent = parent
         self.parent.title("Password Manager")
-        self.parent.config(padx=50, pady=50, bg=BLACK)
+        self.parent.config(padx=50, pady=50)
+
+        self.data_menu = Menu(self.parent)
+        self.data = Menu(self.data_menu, tearoff=0)
+        self.data.add_command(label="Open File", command=self.open_json)
+        self.data.add_command(label="Exit", command=self.exit_program)
+        self.data_menu.add_cascade(label="File", menu=self.data)
+        self.item = Menu(self.data_menu, tearoff=0)
+        self.item.add_command(label="Clean Fields", command=self.clear_all_entries)
+        self.item.add_command(label="Delete Password", command=self.delete_data)
+        self.data_menu.add_cascade(label="Data", menu=self.item)
+        self.parent.config(menu=self.data_menu)
 
         self.websites = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
         self.main_window()
         self.check_status()
+        self.apply_theme()
 
     def main_window(self):
-        self.canvas = Canvas(self.parent, width=200, height=200, highlightthickness=0, bg=BLACK)
+        self.canvas = Canvas(self.parent, width=200, height=200, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
         self.canvas.create_image(100, 100, image=self.picture_png)
-        self.canvas.grid(row=1, column=0, rowspan=7, sticky="w")
+        self.canvas.grid(row=1, column=1, rowspan=7, sticky="w")
 
-        self.label_website = Label(self.parent, text="Website/URL: ", width=20, bg=BLACK, fg=WHITE)
-        self.label_website.config(padx=0, pady=3)
+        self.label_website = ttk.Label(self.parent, text="Website/URL: ", width=20)
         self.label_website.grid(row=2, column=2, sticky="e")
 
-        self.entry_website = tk.Entry(self.parent, width=58)
+        self.entry_website = ttk.Entry(self.parent, width=58)
         self.entry_website.grid(row=2, column=3, columnspan=2, sticky="w")
         self.entry_website.focus()
 
-        self.label_user = Label(self.parent, text="Login: ", width=20, bg=BLACK, fg=WHITE)
+        self.label_user = ttk.Label(self.parent, text="Login: ", width=20)
         self.label_user.grid(row=3, column=2, sticky="e")
-        self.label_user.config(padx=0, pady=3)
 
-        self.entry_user = tk.Entry(self.parent, width=58)
+        self.entry_user = ttk.Entry(self.parent, width=58)
         self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
         self.entry_user.insert(END, string="fromm_daniel@yahoo.de")
 
-        self.label_pw = Label(self.parent, text="Password: ", width=20, bg=BLACK, fg=WHITE)
-        self.label_pw.config(padx=0, pady=3)
+        self.label_pw = ttk.Label(self.parent, text="Password: ", width=20)
         self.label_pw.grid(row=4, column=2, sticky="e")
 
-        self.entry_pw = Entry(self.parent, width=58)
+        self.entry_pw = ttk.Entry(self.parent, width=58)
         self.entry_pw.grid(row=4, column=3, columnspan=2, sticky="w")
 
-        self.label_secure = Label(self.parent, text="Password secure? ", bg=BLACK, fg=WHITE)
-        self.label_secure.grid(row=5, column=2, sticky="")
-        self.label_secure.config(padx=0, pady=3)
+        self.label_secure = ttk.Label(self.parent, text="Password secure? ")
+        self.label_secure.grid(row=5, column=2, sticky="w")
 
-        self.button_copy_website = Button(self.parent, text="Copy", command=self.copy_pw, width=4, bg=BLACK, fg=WHITE)
+        self.button_copy_website = ttk.Button(self.parent, text="Copy", command=self.copy_pw, width=6)
         self.button_copy_website.grid(row=2, column=5, sticky="e")
 
-        self.button_copy_user = Button(self.parent, text="Copy", command=self.copy_user, width=4, bg=BLACK, fg=WHITE)
+        self.button_copy_user = ttk.Button(self.parent, text="Copy", command=self.copy_user, width=6)
         self.button_copy_user.grid(row=3, column=5, sticky="e")
 
-        self.button_copy_pw = Button(self.parent, text="Copy", command=self.copy_pw, width=4, bg=BLACK, fg=WHITE)
+        self.button_copy_pw = ttk.Button(self.parent, text="Copy", command=self.copy_pw, width=6)
         self.button_copy_pw.grid(row=4, column=5, sticky="w")
 
-        self.button_gen_pw = Button(self.parent, width=22, text="Generate Password", command=self.insert_pw_entry, bg=BLACK, fg=WHITE)
+        self.button_gen_pw = ttk.Button(self.parent, width=22, text="Generate Password", command=self.insert_pw_entry)
         self.button_gen_pw.grid(row=5, column=3, sticky="w")
 
-        self.button_add = Button(self.parent, text="Save Password", command=self.save_entries, width=22, bg=BLACK, fg=WHITE)
+        self.button_add = ttk.Button(self.parent, text="Save Password", command=self.save_entries, width=22)
         self.button_add.grid(row=5, column=4, sticky="w")
-
-        self.button_load_file = Button(self.parent, text="Load File", command=self.open_json, width=15, bg=BLACK, fg=WHITE)
-        self.button_load_file.grid(row=1, column=1, sticky="e")
 
         self.combobox = ttk.Combobox(self.parent, width=55, values=self.data.website_option)
         self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
         self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
 
-        self.data_load_delete_item = Button(self.parent, text="Delete Password", command=self.delete_data, width=15, bg=BLACK, fg=WHITE)
-        self.data_load_delete_item.grid(row=5, column=1, sticky="e")
-
-        self.clear_entries = Button(self.parent, text="Clear Entries", command=self.clear_all_entries, width=15, bg=BLACK, fg=WHITE)
-        self.clear_entries.grid(row=3 ,column=1, sticky="e")
-
-        self.label_load_item = Label(self.parent, text="Saved Passwords: ", bg=BLACK, fg=WHITE)
-        self.label_load_item.grid(row=1, column=2)
+        self.label_load_item = ttk.Label(self.parent, text="Saved Passwords: ")
+        self.label_load_item.grid(row=1, column=2, sticky="w")
 
         self.canvas.lower(self.parent)
 
-        self.menubar = Menu(self.parent)
-        self.filemenu = tk.Menu(self.menubar)
-        self.filemenu.add_command(label="Open", command=self.open_json)
-        # self.filemenu.add_command(label="Save", command=self.save_entries)
-        self.filemenu.add_command(label="Exit", command=self.exit_program)
-        self.menubar.add_cascade(label="Filemenu", menu=self.filemenu)
-        self.parent.config(menu=self.menubar)
+    def apply_theme(self):
+        style = ThemedStyle(self.parent)
+        style.set_theme(THEME)
+
+        self.parent.config(bg=style.lookup('TFrame', 'background'))
+        self.canvas.config(bg=style.lookup('TLabel', 'background'))
 
     def exit_program(self):
         if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()):
@@ -109,9 +109,7 @@ class WindowGUI(tk.Frame):
             if response:
                 exit()
             else:
-                None
-
-
+                return None
 
     def update_combobox(self):
         self.data.load_website_options()
@@ -125,9 +123,8 @@ class WindowGUI(tk.Frame):
             password = self.entry_pw.get()
             password_encrypt = self.tools.encrypted_pw
             if not all([website, user, password, password_encrypt]):
-                messagebox.showerror(title="Error!",
-                                     message="The data could not be saved. Please fill out all entries.")
-                return
+                return messagebox.showerror(title="Error!", message="The data could not be saved. "
+                                                                    "Please fill out all entries.")
             response = messagebox.askokcancel(title="Are you sure you want to save?",
                                               message=f"These are the details you entered: \n\nWebsite/URL: "
                                                       f"{website} \nLogin: {user} "
@@ -135,11 +132,11 @@ class WindowGUI(tk.Frame):
             if response:
                 json_encrypt_pw = password_encrypt.decode('utf-8')
                 new_entry = {"Website/URL": website, "Login": user, "Password": json_encrypt_pw}
-                self.data.save_data(new_entry, self.data.read_file)
-                messagebox.showinfo(title="Success!", message="Data saved successfully.")
+                self.data.save_data(new_entry)
                 self.update_combobox()
                 self.entry_website.delete(0, END)
                 self.entry_pw.delete(0, END)
+                messagebox.showinfo(title="Success!", message="Data saved successfully.")
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
@@ -195,24 +192,38 @@ class WindowGUI(tk.Frame):
     def check_status(self):
         password = self.entry_pw.get()
         light_status = self.tools.password_check(password)
-        self.canvas_light_update(light_status)
+        # self.canvas_light_update(light_status)
         self.parent.after(500, self.check_status)
 
     def delete_data(self):
-        self.data.delete_item(self.selected_item)
-        self.update_combobox()
+        check_delete_error = None
+        try:
+            if self.selected_item is None:
+                messagebox.showinfo(title="Error!", message="No Password to delete.")
+                check_delete_error = True
+            self.data.delete_item(self.selected_item)
+            self.update_combobox()
+        except Exception as error:
+            if check_delete_error is not True:
+                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def insert_text(self, website, user, password):
-        if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()) != 0:
+        try:
+            if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()) != 0:
+                self.entry_website.delete(0, END)
+                self.entry_user.delete(0, END)
+                self.entry_pw.delete(0, END)
+            self.entry_website.insert(END, string=website)
+            self.entry_user.insert(END, string=user)
+            self.entry_pw.insert(END, string=password)
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+    def clear_all_entries(self):
+        try:
             self.entry_website.delete(0, END)
             self.entry_user.delete(0, END)
             self.entry_pw.delete(0, END)
-        self.entry_website.insert(END, string=website)
-        self.entry_user.insert(END, string=user)
-        self.entry_pw.insert(END, string=password)
-
-    def clear_all_entries(self):
-        self.entry_website.delete(0, END)
-        self.entry_user.delete(0, END)
-        self.entry_pw.delete(0, END)
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
