@@ -144,17 +144,17 @@ class WindowGUI(tk.Frame):
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def open_json(self):
-            try:
-                self.data.open_json_file()
-                if self.data.read_file:
-                    messagebox.showinfo(title="Success!", message="File loaded successfully.")
-                    self.update_combobox()
-            except FileNotFoundError:
-                messagebox.showinfo(title="Error!", message="File not found.")
-            except json.JSONDecodeError:
-                messagebox.showinfo(title="Error!", message="Could not decode JSON.")
-            except Exception as error:
-                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        try:
+            self.data.open_json_file()
+            if self.data.read_file:
+                messagebox.showinfo(title="Success!", message="File loaded successfully.")
+                self.update_combobox()
+        except FileNotFoundError:
+            messagebox.showinfo(title="Error!", message="File not found.")
+        except json.JSONDecodeError:
+            messagebox.showinfo(title="Error!", message="Could not decode JSON.")
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def on_combobox_select(self, event):
         selected_value = event.widget.get()
@@ -226,4 +226,3 @@ class WindowGUI(tk.Frame):
             self.entry_pw.delete(0, END)
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
-
