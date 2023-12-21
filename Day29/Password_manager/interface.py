@@ -9,7 +9,7 @@ import json
 
 BLACK = "black"
 WHITE = "white"
-THEME = "equilux"
+THEME = "itft1"
 
 
 class WindowGUI(tk.Frame):
@@ -35,7 +35,7 @@ class WindowGUI(tk.Frame):
         self.data_menu.add_cascade(label="Data", menu=self.item)
         self.parent.config(menu=self.data_menu)
 
-        self.websites = tk.StringVar()
+        self.websites_var = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
         self.main_window()
