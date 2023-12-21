@@ -22,8 +22,6 @@ class Data:
                 self.read_file = json.load(file)
 
     def save_data(self, new_item):
-        # if not self.json_data_path:
-        #     self.open_json_file()
         if new_item is not None:
             self.read_file.append(new_item)
         with open(self.json_data_path, "w") as wright_data:

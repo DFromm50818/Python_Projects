@@ -9,7 +9,7 @@ import json
 
 BLACK = "black"
 WHITE = "white"
-THEME = "itft1"
+THEME = "keramik"
 
 
 class WindowGUI(tk.Frame):
@@ -60,7 +60,7 @@ class WindowGUI(tk.Frame):
 
         self.entry_user = ttk.Entry(self.parent, width=58)
         self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
-        self.entry_user.insert(END, string="fromm_daniel@yahoo.de")
+        # self.entry_user.insert(END, string="")
 
         self.label_pw = ttk.Label(self.parent, text="Password: ", width=20)
         self.label_pw.grid(row=4, column=2, sticky="e")
@@ -81,10 +81,10 @@ class WindowGUI(tk.Frame):
         self.button_copy_pw.grid(row=4, column=5, sticky="w")
 
         self.button_gen_pw = ttk.Button(self.parent, width=22, text="Generate Password", command=self.insert_pw_entry)
-        self.button_gen_pw.grid(row=5, column=3, sticky="w")
+        self.button_gen_pw.grid(row=6, column=3, sticky="w")
 
         self.button_add = ttk.Button(self.parent, text="Save Password", command=self.save_entries, width=22)
-        self.button_add.grid(row=5, column=4, sticky="w")
+        self.button_add.grid(row=6, column=4, sticky="w")
 
         self.combobox = ttk.Combobox(self.parent, width=55, values=self.data.website_option)
         self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
@@ -93,12 +93,14 @@ class WindowGUI(tk.Frame):
         self.label_load_item = ttk.Label(self.parent, text="Saved Passwords: ")
         self.label_load_item.grid(row=1, column=2, sticky="w")
 
+        self.label_color = tk.Label(self.parent, text="", width=49, highlightthickness=1, highlightbackground="black")
+        self.label_color.grid(row=5, column=3, columnspan=2, sticky="w")
+
         self.canvas.lower(self.parent)
 
     def apply_theme(self):
         style = ThemedStyle(self.parent)
         style.set_theme(THEME)
-
         self.parent.config(bg=style.lookup('TFrame', 'background'))
         self.canvas.config(bg=style.lookup('TLabel', 'background'))
 
@@ -135,6 +137,7 @@ class WindowGUI(tk.Frame):
                 self.data.save_data(new_entry)
                 self.update_combobox()
                 self.entry_website.delete(0, END)
+                self.entry_user.delete(0, END)
                 self.entry_pw.delete(0, END)
                 messagebox.showinfo(title="Success!", message="Data saved successfully.")
         except Exception as error:
@@ -180,19 +183,16 @@ class WindowGUI(tk.Frame):
 
     def canvas_light_update(self, light_status):
         if light_status == "green":
-            self.label_secure.config(padx=0, pady=3, bg="green", fg=WHITE)
-            # self.canvas_oval.create_oval(1, 1, 19, 19, outline="black", fill="green")
+            self.label_color.config(padx=0, pady=3, bg="green", fg=WHITE, height=1)
         elif light_status == "yellow":
-            self.label_secure.config(padx=0, pady=3, bg="yellow", fg=WHITE)
-            # self.canvas_oval.create_oval(1, 1, 19, 19, outline="black", fill="yellow")
+            self.label_color.config(padx=0, pady=3, bg="yellow", fg=WHITE, height=1)
         else:
-            self.label_secure.config(padx=0, pady=3, bg="red", fg=WHITE)
-            # self.canvas_oval.create_oval(1, 1, 19, 19, outline="black", fill="red")
+            self.label_color.config(padx=0, pady=3, bg="red", fg=WHITE, height=1)
 
     def check_status(self):
         password = self.entry_pw.get()
         light_status = self.tools.password_check(password)
-        # self.canvas_light_update(light_status)
+        self.canvas_light_update(light_status)
         self.parent.after(500, self.check_status)
 
     def delete_data(self):
