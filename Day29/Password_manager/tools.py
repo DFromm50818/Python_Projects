@@ -7,8 +7,6 @@ import string
 class PasswordTools:
     def __init__(self):
         self.light = "grey"
-        self.pw_user = ""
-        self.encrypted_pw = None
         self.key = Fernet.generate_key()
         self.cipher_suite = Fernet(b'L7CRVk_CnF40i9exhmYzS397F-XGYvNh0QJ2fi5O4GU=')
 
@@ -21,7 +19,7 @@ class PasswordTools:
             len(digits) >= 3 and len(symbols) >= 3 and len(letter_upper) >= 4 and len(letter_lower) >= 4,
             len(digits) >= 2 and len(symbols) >= 2 and len(letter_upper) >= 3 and len(letter_lower) >= 3
         ]
-        self.light = "green" if any(conditions) else "yellow" if password else "red"
+        self.light = "strong" if any(conditions) else "medium" if password else "weak"
         return self.light
 
     def generate_password(self):
@@ -33,14 +31,13 @@ class PasswordTools:
         ]
         pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
         shuffle(pw_new)
-        pw = "".join(pw_new)
-        pyperclip.copy(pw)
-        self.encrypt_password(pw)
-        self.pw_user = pw
+        pw_user = "".join(pw_new)
+        return pw_user
 
     def encrypt_password(self, password):
-        self.encrypted_pw = self.cipher_suite.encrypt(password.encode())
-        return self.encrypted_pw
+        encrypted_pw = self.cipher_suite.encrypt(password.encode())
+        json_encrypt_pw = encrypted_pw.decode('utf-8')
+        return json_encrypt_pw
 
     def decrypt_password(self, encrypt_pw):
         byte_format_password = encrypt_pw.encode('utf-8')

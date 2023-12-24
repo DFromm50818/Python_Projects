@@ -60,7 +60,6 @@ class WindowGUI(tk.Frame):
 
         self.entry_user = ttk.Entry(self.parent, width=58)
         self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
-        # self.entry_user.insert(END, string="")
 
         self.label_pw = ttk.Label(self.parent, text="Password: ", width=20)
         self.label_pw.grid(row=4, column=2, sticky="e")
@@ -71,7 +70,7 @@ class WindowGUI(tk.Frame):
         self.label_secure = ttk.Label(self.parent, text="Password secure? ")
         self.label_secure.grid(row=5, column=2, sticky="w")
 
-        self.button_copy_website = ttk.Button(self.parent, text="Copy", command=self.copy_pw, width=6)
+        self.button_copy_website = ttk.Button(self.parent, text="Copy", command=self.copy_website, width=6)
         self.button_copy_website.grid(row=2, column=5, sticky="e")
 
         self.button_copy_user = ttk.Button(self.parent, text="Copy", command=self.copy_user, width=6)
@@ -93,16 +92,56 @@ class WindowGUI(tk.Frame):
         self.label_load_item = ttk.Label(self.parent, text="Saved Passwords: ")
         self.label_load_item.grid(row=1, column=2, sticky="w")
 
-        self.label_color = tk.Label(self.parent, text="", width=49, highlightthickness=1, highlightbackground="black")
-        self.label_color.grid(row=5, column=3, columnspan=2, sticky="w")
+        self.label_color = ttk.Label(self.parent)
+        self.label_color.grid(row=5, column=3, sticky="w")
 
         self.canvas.lower(self.parent)
+
+    def create_file_window(self):
+        self.enter_filenname_window = tk.Toplevel(self.parent)
+        self.enter_filenname_window.title("Create File")
+        self.enter_filenname_window.config(padx=50, pady=50)
+
+        self.label_enter_name = ttk.Label(self.enter_filenname_window, text="Enter Filename: ")
+        self.label_enter_name.grid(row=0, column=0)
+
+        self.entry_name = ttk.Entry(self.enter_filenname_window, width=58)
+        self.entry_name.grid(row=0, column=1, columnspan=2)
+
+        self.button_ok = ttk.Button(self.enter_filenname_window, text="Ok", command=self.new_file, width=12)
+        self.button_ok.grid(row=2, column=1)
+
+        self.button_cancel = ttk.Button(self.enter_filenname_window, text="Cancel", command=self.name_window, width=12)
+        self.button_cancel.grid(row=2, column=2)
+
+        # self.create_file_window().protocol("WM_DELETE_WINDOW", self.new_file)
+
+
+    def new_file(self):
+        self.data.create_file(self.entry_name.get())
+        # self.name_window()
 
     def apply_theme(self):
         style = ThemedStyle(self.parent)
         style.set_theme(THEME)
         self.parent.config(bg=style.lookup('TFrame', 'background'))
         self.canvas.config(bg=style.lookup('TLabel', 'background'))
+
+    def no_file_found(self):
+        file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file "
+                                                                                     "press Ok or load a file "
+                                                                                     "press Cancel")
+        if file_not_found:
+            self.create_file_window()
+            # self.data.create_file(self.entry_name.get())
+            if self.data.check_file_exists(self.entry_name.get()):
+                self.enter_filenname_window.destroy()
+        else:
+            self.open_json()
+
+    def name_window(self):
+        if self.enter_filenname_window.winfo_exists():
+            self.enter_filenname_window.destroy()
 
     def exit_program(self):
         if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()):
@@ -123,18 +162,18 @@ class WindowGUI(tk.Frame):
             website = self.entry_website.get()
             user = self.entry_user.get()
             password = self.entry_pw.get()
-            password_encrypt = self.tools.encrypted_pw
+            password_encrypt = self.tools.encrypt_password(self.entry_pw.get())
             if not all([website, user, password, password_encrypt]):
                 return messagebox.showerror(title="Error!", message="The data could not be saved. "
                                                                     "Please fill out all entries.")
+            if self.data.json_data_path is False:
+                self.no_file_found()
             response = messagebox.askokcancel(title="Are you sure you want to save?",
-                                              message=f"These are the details you entered: \n\nWebsite/URL: "
-                                                      f"{website} \nLogin: {user} "
-                                                      f"\nPassword: {password} \n\nIs it ok to save?")
+                                          message=f"These are the details you entered: \n\nWebsite/URL: "
+                                                  f"{website} \nLogin: {user} "
+                                                  f"\nPassword: {password} \n\nIs it ok to save?")
             if response:
-                json_encrypt_pw = password_encrypt.decode('utf-8')
-                new_entry = {"Website/URL": website, "Login": user, "Password": json_encrypt_pw}
-                self.data.save_data(new_entry)
+                self.data.save_new_data(website, user, password_encrypt)
                 self.update_combobox()
                 self.entry_website.delete(0, END)
                 self.entry_user.delete(0, END)
@@ -168,6 +207,9 @@ class WindowGUI(tk.Frame):
                     self.encrypted_pw = self.tools.decrypt_password(self.pw_show)
                     self.insert_text(self.website_show, self.user_show, self.encrypted_pw)
 
+    def copy_website(self):
+        pyperclip.copy(self.entry_website.get())
+
     def copy_pw(self):
         pyperclip.copy(self.entry_pw.get())
 
@@ -176,23 +218,20 @@ class WindowGUI(tk.Frame):
 
     def insert_pw_entry(self):
         self.entry_pw.delete(0, END)
-        self.tools.generate_password()
-        pw = self.tools.pw_user
+        pw = self.tools.generate_password()
         if len(pw) != 0:
             self.entry_pw.insert(END, string=pw)
 
-    def canvas_light_update(self, light_status):
-        if light_status == "green":
-            self.label_color.config(padx=0, pady=3, bg="green", fg=WHITE, height=1)
-        elif light_status == "yellow":
-            self.label_color.config(padx=0, pady=3, bg="yellow", fg=WHITE, height=1)
+    def security_light_update(self, light_status):
+        if light_status == "strong":
+            self.label_color.config(text="STRONG")
+        elif light_status == "medium":
+            self.label_color.config(text="MEDIUM")
         else:
-            self.label_color.config(padx=0, pady=3, bg="red", fg=WHITE, height=1)
+            self.label_color.config(text="WEAK")
 
     def check_status(self):
-        password = self.entry_pw.get()
-        light_status = self.tools.password_check(password)
-        self.canvas_light_update(light_status)
+        self.security_light_update(self.tools.password_check(self.entry_pw.get()))
         self.parent.after(500, self.check_status)
 
     def delete_data(self):
@@ -202,7 +241,12 @@ class WindowGUI(tk.Frame):
                 messagebox.showinfo(title="Error!", message="No Password to delete.")
                 check_delete_error = True
             self.data.delete_item(self.selected_item)
+            self.data.save_new_data()
             self.update_combobox()
+            self.entry_website.delete(0, END)
+            self.entry_user.delete(0, END)
+            self.entry_pw.delete(0, END)
+            self.combobox.set("")
         except Exception as error:
             if check_delete_error is not True:
                 messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
