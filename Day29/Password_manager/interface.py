@@ -7,8 +7,6 @@ from data import Data
 import pyperclip
 import json
 
-BLACK = "black"
-WHITE = "white"
 THEME = "keramik"
 
 
@@ -116,7 +114,6 @@ class WindowGUI(tk.Frame):
 
         # self.create_file_window().protocol("WM_DELETE_WINDOW", self.new_file)
 
-
     def new_file(self):
         self.data.create_file(self.entry_name.get())
         # self.name_window()
@@ -129,8 +126,8 @@ class WindowGUI(tk.Frame):
 
     def no_file_found(self):
         file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file "
-                                                                                     "press Ok or load a file "
-                                                                                     "press Cancel")
+                                                                                "press Ok or load a file "
+                                                                                "press Cancel")
         if file_not_found:
             self.create_file_window()
             # self.data.create_file(self.entry_name.get())
@@ -169,9 +166,9 @@ class WindowGUI(tk.Frame):
             if self.data.json_data_path is False:
                 self.no_file_found()
             response = messagebox.askokcancel(title="Are you sure you want to save?",
-                                          message=f"These are the details you entered: \n\nWebsite/URL: "
-                                                  f"{website} \nLogin: {user} "
-                                                  f"\nPassword: {password} \n\nIs it ok to save?")
+                                                    message=f"These are the details you entered: \n\nWebsite/URL: "
+                                                    f"{website} \nLogin: {user} "
+                                                    f"\nPassword: {password} \n\nIs it ok to save?")
             if response:
                 self.data.save_new_data(website, user, password_encrypt)
                 self.update_combobox()

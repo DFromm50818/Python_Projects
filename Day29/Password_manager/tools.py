@@ -1,5 +1,4 @@
 from random import randint, choice, shuffle
-import pyperclip
 from cryptography.fernet import Fernet
 import string
 
