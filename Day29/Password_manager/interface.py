@@ -10,7 +10,7 @@ import json
 THEME = "keramik"
 
 
-class WindowGUI(tk.Frame):
+class AppWindow(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.website_show = ""
@@ -19,25 +19,27 @@ class WindowGUI(tk.Frame):
         self.encrypted_pw = None
         self.selected_item = None
         self.parent = parent
+        self.window_data = WindowData(parent)
         self.parent.title("Password Manager")
         self.parent.config(padx=50, pady=50)
 
         self.data_menu = Menu(self.parent)
         self.data = Menu(self.data_menu, tearoff=0)
-        self.data.add_command(label="Open File", command=self.open_json)
-        self.data.add_command(label="Exit", command=self.exit_program)
+        self.data.add_command(label="Open File", command=self.window_data.open_json)
+        self.data.add_command(label="Exit", command=self.window_data.exit_program)
         self.data_menu.add_cascade(label="File", menu=self.data)
         self.item = Menu(self.data_menu, tearoff=0)
-        self.item.add_command(label="Clean Fields", command=self.clear_all_entries)
-        self.item.add_command(label="Delete Password", command=self.delete_data)
+        self.item.add_command(label="Clean Fields", command=self.window_data.clear_all_entries)
+        self.item.add_command(label="Delete Password", command=self.window_data.delete_data)
         self.data_menu.add_cascade(label="Data", menu=self.item)
         self.parent.config(menu=self.data_menu)
 
         self.websites_var = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
+
         self.main_window()
-        self.check_status()
+        self.window_data.check_status()
         self.apply_theme()
 
     def main_window(self):
@@ -68,24 +70,24 @@ class WindowGUI(tk.Frame):
         self.label_secure = ttk.Label(self.parent, text="Password secure? ")
         self.label_secure.grid(row=5, column=2, sticky="w")
 
-        self.button_copy_website = ttk.Button(self.parent, text="Copy", command=self.copy_website, width=6)
+        self.button_copy_website = ttk.Button(self.parent, text="Copy", command=self.window_data.copy_website, width=6)
         self.button_copy_website.grid(row=2, column=5, sticky="e")
 
-        self.button_copy_user = ttk.Button(self.parent, text="Copy", command=self.copy_user, width=6)
+        self.button_copy_user = ttk.Button(self.parent, text="Copy", command=self.window_data.copy_user, width=6)
         self.button_copy_user.grid(row=3, column=5, sticky="e")
 
-        self.button_copy_pw = ttk.Button(self.parent, text="Copy", command=self.copy_pw, width=6)
+        self.button_copy_pw = ttk.Button(self.parent, text="Copy", command=self.window_data.copy_pw, width=6)
         self.button_copy_pw.grid(row=4, column=5, sticky="w")
 
-        self.button_gen_pw = ttk.Button(self.parent, width=22, text="Generate Password", command=self.insert_pw_entry)
+        self.button_gen_pw = ttk.Button(self.parent, width=22, text="Generate Password", command=self.window_data.insert_pw_entry)
         self.button_gen_pw.grid(row=6, column=3, sticky="w")
 
-        self.button_add = ttk.Button(self.parent, text="Save Password", command=self.save_entries, width=22)
+        self.button_add = ttk.Button(self.parent, text="Save Password", command=self.window_data.save_entries, width=22)
         self.button_add.grid(row=6, column=4, sticky="w")
 
         self.combobox = ttk.Combobox(self.parent, width=55, values=self.data.website_option)
         self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
-        self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
+        self.combobox.bind("<<ComboboxSelected>>", self.window_data.on_combobox_select)
 
         self.label_load_item = ttk.Label(self.parent, text="Saved Passwords: ")
         self.label_load_item.grid(row=1, column=2, sticky="w")
@@ -106,23 +108,31 @@ class WindowGUI(tk.Frame):
         self.entry_name = ttk.Entry(self.enter_filenname_window, width=58)
         self.entry_name.grid(row=0, column=1, columnspan=2)
 
-        self.button_ok = ttk.Button(self.enter_filenname_window, text="Ok", command=self.new_file, width=12)
+        self.button_ok = ttk.Button(self.enter_filenname_window, text="Ok", command=self.window_data.new_file(self.entry_name.get()), width=12)
         self.button_ok.grid(row=2, column=1)
 
-        self.button_cancel = ttk.Button(self.enter_filenname_window, text="Cancel", command=self.name_window, width=12)
+        self.button_cancel = ttk.Button(self.enter_filenname_window, text="Cancel", command=self.window_data.name_window, width=12)
         self.button_cancel.grid(row=2, column=2)
 
         # self.create_file_window().protocol("WM_DELETE_WINDOW", self.new_file)
-
-    def new_file(self):
-        self.data.create_file(self.entry_name.get())
-        # self.name_window()
 
     def apply_theme(self):
         style = ThemedStyle(self.parent)
         style.set_theme(THEME)
         self.parent.config(bg=style.lookup('TFrame', 'background'))
         self.canvas.config(bg=style.lookup('TLabel', 'background'))
+
+
+class WindowData:
+    def __init__(self, parent):
+        self.parent = parent
+        self.tools = PasswordTools()
+        self.data = Data()
+        self.app_appearance = AppWindow(parent)
+
+    def new_file(self, entry_name):
+        self.data.create_file(entry_name)
+        # self.name_window()
 
     def no_file_found(self):
         file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file "
@@ -141,13 +151,12 @@ class WindowGUI(tk.Frame):
             self.enter_filenname_window.destroy()
 
     def exit_program(self):
-        if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_pw.get()):
-            response = messagebox.askokcancel(title="Quit program? ",
-                                              message=f"You have entered some details. Are your sure you want to quit?")
-            if response:
-                exit()
-            else:
-                return None
+        response = messagebox.askokcancel(title="Quit program? ",
+                                          message=f"All unsaved Data are lost.")
+        if response:
+            exit()
+        else:
+            return None
 
     def update_combobox(self):
         self.data.load_website_options()

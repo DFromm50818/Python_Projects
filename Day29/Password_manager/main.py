@@ -3,5 +3,5 @@ import interface
 
 if __name__ == "__main__":
     root = Tk()
-    interface.WindowGUI(root)
+    interface.App_Window(root)
     root.mainloop()
