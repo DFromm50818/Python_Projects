@@ -18,7 +18,7 @@ class Data:
                 self.json_data_path = os.path.abspath(self.file_path)
                 self.read_file = json.load(file)
 
-    def save_new_data(self, website = None, user = None, password_encrypt = None):
+    def save_new_data(self, website=None, user=None, password_encrypt=None):
         if all((website, user, password_encrypt)):
             new_entry = {"Website/URL": website, "Login": user, "Password": password_encrypt}
             self.read_file.append(new_entry)
@@ -37,9 +37,6 @@ class Data:
     def create_file(self):
         filepath = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
         self.json_data_path = os.path.abspath(filepath)
-        with open(self.json_data_path, "w") as new_file:
+        with open(self.json_data_path, "w") as _:
             pass
         return self.json_data_path
-
-    def check_file_exists(self, filename):
-        return os.path.exists(filename)

@@ -5,7 +5,6 @@ from ttkthemes import *
 from tools import PasswordTools
 from data import Data
 import pyperclip
-import json
 
 THEME = "keramik"
 
