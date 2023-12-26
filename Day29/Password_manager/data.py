@@ -34,9 +34,10 @@ class Data:
         self.read_file = [item for item in self.read_file if item != item_to_delete]
         return self.read_file
 
-    def create_file(self, filename):
-        self.json_data_path = os.path.abspath(filename)
-        with open(self.json_data_path + ".json", "w") as new_file:
+    def create_file(self):
+        filepath = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+        self.json_data_path = os.path.abspath(filepath)
+        with open(self.json_data_path, "w") as new_file:
             pass
         return self.json_data_path
 
