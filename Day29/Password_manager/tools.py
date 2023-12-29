@@ -46,4 +46,8 @@ class PasswordTools:
         return key
 
     def insert_security_key(self, key):
-        self.cipher_suite = Fernet(key)
+        try:
+            self.cipher_suite = Fernet(key)
+            return True
+        except:
+            return None

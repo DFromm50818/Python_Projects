@@ -1,4 +1,3 @@
-import pickle
 from tkinter import filedialog
 import json
 import os
@@ -8,7 +7,7 @@ class Data:
     def __init__(self):
         self.file_path = ""
         self.json_data_path = False
-        self.key_path = None
+        self.key_path = ""
         self.read_file = []
         self.website_option = []
 
@@ -43,13 +42,13 @@ class Data:
         return self.json_data_path
 
     def create_key_file(self, key):
-        filepath = filedialog.asksaveasfilename(defaultextension=".bin", filetypes=[("BIN files", "*.bin")])
-        with open(filepath, "wb") as file:
+        self.key_path = filedialog.asksaveasfilename(defaultextension=".bin", filetypes=[("BIN files", "*.bin")])
+        with open(self.key_path, "wb") as file:
             file.write(key)
 
     def load_key_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
+        self.key_path = filedialog.askopenfilename(filetypes=[("BIN files", "*.bin")])
+        if os.path.exists(self.key_path):
+            with open(self.key_path, 'rb') as file:
                 encrypted_key = file.read()
             return encrypted_key

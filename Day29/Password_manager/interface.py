@@ -9,127 +9,152 @@ import json
 THEME = "keramik"
 
 
-class AppWindow(Frame):
-    def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent, *args, **kwargs)
-        # Imports Object from other Files
+class AppManager:
+    def __init__(self, root, *args, **kwargs):
         self.tools = PasswordTools()
         self.data = Data()
-        # Create App_window
         self.selected_item = None
-        self.parent = parent
-        self.parent.title("Password Manager")
-        self.parent.config(padx=50, pady=50)
-        # Create Menubar
-        self.data_menu = Menu(self.parent)
+        self.main_window = root
+        self.main_window.title("Password Manager")
+        self.main_window.geometry("1200x800")
+
+        self.menubar_main(self.main_window)
+
+        self.sidebar = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
+        self.welcome = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
+        self.key_loading = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
+        self.password_manager = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
+
+        self.welcome_screen_button = ttk.Button(self.sidebar, text="Welcome", command=lambda: self.welcome_screen(self.welcome), width=30)
+        self.welcome_screen_button.pack(side="top")
+        self.key_loading_screen_button = ttk.Button(self.sidebar, text="Key Management", command=lambda: self.key_loading_screen(self.key_loading), width=30)
+        self.key_loading_screen_button.pack(side="top")
+        self.password_manager_screen_button = ttk.Button(self.sidebar, text="Password Manager", command=lambda: self.password_manager_screen(self.password_manager), width=30)
+        self.password_manager_screen_button.pack(side="top")
+
+        self.sidebar.pack(side="left", fill="y")
+        self.key_loading.pack(side="left", fill="both", expand=True)
+
+        self.welcome_screen(self.welcome)
+        self.apply_theme(root)
+
+    def welcome_screen(self, frame):
+        self.password_manager.pack_forget()
+        self.key_loading.pack_forget()
+        self.welcome.pack(side="left", fill="both", expand=True)
+
+        self.canvas = Canvas(frame, width=200, height=200, highlightthickness=0)
+        self.picture_png = PhotoImage(file="logo.png")
+        self.canvas.create_image(100, 100, image=self.picture_png)
+        self.canvas.place(relx=0.39, rely=0.3)
+
+        self.label_welcome = ttk.Label(frame, text="Welcome to MyPass", font=("Arial", 30))
+        self.label_welcome.place(relx=0.32, rely=0.2)
+
+    def key_loading_screen(self, frame):
+        self.welcome.pack_forget()
+        self.password_manager.pack_forget()
+        self.key_loading.pack(side="left", fill="both", expand=True)
+
+        self.label = ttk.Label(frame, text="Load or create a Keyfile.")
+        self.label.place(relx=0.5, rely=0.25, relwidth=0.5, relheight=0.25, anchor="center")
+
+        self.load_button = ttk.Button(frame, text="Load", command=self.button_pushed_load_key, width=10)
+        self.load_button.place(relx=0.25, rely=0.5, anchor="center")
+
+        self.create_button = ttk.Button(frame, text="Create key file", command=self.button_pushed_create_key_file, width=10)
+        self.create_button.place(relx=0.75, rely=0.5, anchor="center")
+
+    def password_manager_screen(self, frame):
+        self.welcome.pack_forget()
+        self.key_loading.pack_forget()
+        self.password_manager.pack(side="left", fill="both", expand=True)
+
+        # Create Widgets for App_window
+        self.label_website = ttk.Label(frame, text="Website/URL: ", width=18)
+        self.label_website.grid(row=2, column=2, sticky="e")
+
+        self.entry_website = ttk.Entry(frame, width=58)
+        self.entry_website.grid(row=2, column=3, columnspan=2, sticky="w")
+        self.entry_website.focus()
+
+        self.label_user = ttk.Label(frame, text="Login: ", width=18)
+        self.label_user.grid(row=3, column=2, sticky="e")
+
+        self.entry_user = ttk.Entry(frame, width=58)
+        self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
+
+        self.label_pw = ttk.Label(frame, text="Password: ", width=18)
+        self.label_pw.grid(row=4, column=2, sticky="e")
+
+        self.entry_pw = ttk.Entry(frame, width=58)
+        self.entry_pw.grid(row=4, column=3, columnspan=2, sticky="w")
+
+        self.label_secure = ttk.Label(frame, text="Password secure? ", width=18)
+        self.label_secure.grid(row=5, column=2, sticky="e")
+
+        self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.get()), width=6)
+        self.button_copy_website.grid(row=2, column=5, sticky="w")
+
+        self.button_copy_user = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_user.get()), width=6)
+        self.button_copy_user.grid(row=3, column=5, sticky="w")
+
+        self.button_copy_pw = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_pw.get()), width=6)
+        self.button_copy_pw.grid(row=4, column=5, sticky="w")
+
+        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.entry_pw.insert(END, string=self.insert_generated_password_entry_pw()))
+        self.button_gen_pw.grid(row=6, column=3, sticky="w")
+
+        self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
+        self.button_add.grid(row=6, column=4, sticky="w")
+
+        self.combobox = ttk.Combobox(frame, width=55, postcommand=self.combobox_load_options)
+        self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
+        self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
+
+        self.label_load_item = ttk.Label(frame, text="Saved Passwords: ", width=18)
+        self.label_load_item.grid(row=1, column=2, sticky="e")
+
+        self.label_security_step = ttk.Label(frame)
+        self.label_security_step.grid(row=5, column=3, sticky="w")
+
+        self.label_error = ttk.Label(frame, width=120)
+        self.label_error.grid(row=7, column=0, columnspan=5)
+
+        self.check_security_status()
+
+    def menubar_main(self, root):
+        self.data_menu = Menu(root)
+
         self.menu = Menu(self.data_menu, tearoff=0)
         self.menu.add_command(label="Load File", command=self.button_pushed_load_file)
         self.menu.add_command(label="Load Key", command=self.button_pushed_load_key)
         self.menu.add_command(label="Exit", command=self.exit_program)
         self.data_menu.add_cascade(label="File", menu=self.menu)
+
         self.item = Menu(self.data_menu, tearoff=0)
         self.item.add_command(label="Clean Fields", command=self.clear_all_entries)
         self.item.add_command(label="Delete Password", command=self.delete_data_from_file)
         self.data_menu.add_cascade(label="Data", menu=self.item)
-        self.parent.config(menu=self.data_menu)
-        # Create Widgets for App_window
-        self.canvas = Canvas(self.parent, width=200, height=200, highlightthickness=0)
-        self.picture_png = PhotoImage(file="logo.png")
-        self.canvas.create_image(100, 100, image=self.picture_png)
-        self.canvas.grid(row=1, column=1, rowspan=7, sticky="w")
 
-        self.label_website = ttk.Label(self.parent, text="Website/URL: ", width=20)
-        self.label_website.grid(row=2, column=2, sticky="e")
+        self.key = Menu(self.data_menu, tearoff=0)
+        self.key.add_command(label="Load Keyfile", command=self.button_pushed_load_key)
+        self.key.add_command(label="Create Keyfile", command=self.button_pushed_create_key_file)
+        self.data_menu.add_cascade(label="Key Management", menu=self.key)
+        self.main_window.config(menu=self.data_menu)
 
-        self.entry_website = ttk.Entry(self.parent, width=58)
-        self.entry_website.grid(row=2, column=3, columnspan=2, sticky="w")
-        self.entry_website.focus()
-
-        self.label_user = ttk.Label(self.parent, text="Login: ", width=20)
-        self.label_user.grid(row=3, column=2, sticky="e")
-
-        self.entry_user = ttk.Entry(self.parent, width=58)
-        self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
-
-        self.label_pw = ttk.Label(self.parent, text="Password: ", width=20)
-        self.label_pw.grid(row=4, column=2, sticky="e")
-
-        self.entry_pw = ttk.Entry(self.parent, width=58)
-        self.entry_pw.grid(row=4, column=3, columnspan=2, sticky="w")
-
-        self.label_secure = ttk.Label(self.parent, text="Password secure? ")
-        self.label_secure.grid(row=5, column=2, sticky="w")
-
-        self.button_copy_website = ttk.Button(self.parent, text="Copy",
-                                              command=lambda: pyperclip.copy(self.entry_website.get()), width=6)
-        self.button_copy_website.grid(row=2, column=5, sticky="e")
-
-        self.button_copy_user = ttk.Button(self.parent, text="Copy",
-                                           command=lambda: pyperclip.copy(self.entry_user.get()), width=6)
-        self.button_copy_user.grid(row=3, column=5, sticky="e")
-
-        self.button_copy_pw = ttk.Button(self.parent, text="Copy",
-                                         command=lambda: pyperclip.copy(self.entry_pw.get()), width=6)
-        self.button_copy_pw.grid(row=4, column=5, sticky="w")
-
-        self.button_gen_pw = ttk.Button(self.parent, width=22, text="Generate Password", command=lambda: self.entry_pw.
-                                        insert(END, string=self.insert_generated_password_entry_pw()))
-        self.button_gen_pw.grid(row=6, column=3, sticky="w")
-
-        self.button_add = ttk.Button(self.parent, text="Save Password",
-                                     command=lambda: self.button_pushed_save_data(
-                                         self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()),
-                                     width=22)
-        self.button_add.grid(row=6, column=4, sticky="w")
-
-        self.combobox = ttk.Combobox(self.parent, width=55, postcommand=self.combobox_load_options)
-        self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
-        self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
-
-        self.label_load_item = ttk.Label(self.parent, text="Saved Passwords: ")
-        self.label_load_item.grid(row=1, column=2, sticky="w")
-
-        self.label_security_step = ttk.Label(self.parent)
-        self.label_security_step.grid(row=5, column=3, sticky="w")
-
-        self.canvas.lower(self.parent)
-
-        self.label_error = ttk.Label(self.parent, width=120)
-        self.label_error.grid(row=7, column=0, columnspan=5)
-
-        self.parent.protocol("WM_DELETE_WINDOW", self.exit_program)
-        # Starts widget function in background
-        self.check_security_status()
-        self.apply_theme()
-        # Starts load or create key
-        self.show_custom_message()
-        # self.start_up_key_handling()
-
-    def show_custom_message(self):
-        top = Toplevel()
-        top.title("Custom Message Box")
-
-        label = Label(top, text="Custom Message")
-        label.pack(padx=20, pady=10)
-
-        ok_button = Button(top, text="Load", command=top.destroy)
-        ok_button.pack(padx=5, pady=5, side=LEFT)
-
-        cancel_button = Button(top, text="create", command=top.destroy)
-        cancel_button.pack(padx=5, pady=5, side=LEFT)
-
-    def apply_theme(self):
+    def apply_theme(self, frame):
         try:
-            style = ThemedStyle(self.parent)
-            style.set_theme(THEME)
-            self.parent.config(bg=style.lookup('TFrame', 'background'))
-            self.canvas.config(bg=style.lookup('TLabel', 'background'))
+            self.style = ThemedStyle(frame)
+            self.style.set_theme(THEME)
+            self.main_window.config(bg=self.style.lookup('TFrame', 'background'))
+            self.canvas.config(bg=self.style.lookup('TLabel', 'background'))
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def check_security_status(self):
         try:
-            self.parent.after(500, self.check_security_status)
+            self.main_window.after(500, self.check_security_status)
             self.security_light_update(self.tools.password_check(self.entry_pw.get()))
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
@@ -248,7 +273,7 @@ class AppWindow(Frame):
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def start_up_key_handling(self):
+    def key_handling(self):
         try:
             file_key = messagebox.askokcancel(title="Load file key.", message="Load key or create new key.")
             if file_key:
@@ -261,14 +286,22 @@ class AppWindow(Frame):
     def button_pushed_load_key(self):
         try:
             key_value = self.data.load_key_file()
-            self.tools.insert_security_key(key_value)
+            status = self.tools.insert_security_key(key_value)
+            if status:
+                return True
         except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+            return None
+            # messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def button_pushed_create_key_file(self):
         try:
             create_key = self.tools.generate_security_key()
             self.data.create_key_file(create_key)
-            self.tools.insert_security_key(create_key)
+            status = self.tools.insert_security_key(create_key)
+            messagebox.showinfo(title="Important!", message="Remember: Losing your Keyfile means no way to "
+                                                            "decrypt your passwords.")
+            if status:
+                return True
         except Exception as error:
+            # return None
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
