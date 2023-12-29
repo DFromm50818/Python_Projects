@@ -1,23 +1,21 @@
-from tkinter import ttk, messagebox
-from tkinter import *
-from ttkthemes import *
+from tkinter import messagebox
 from ttkbootstrap import *
 from tools import PasswordTools
 from data import Data
 import pyperclip
 import json
 
-THEME ="darkly" #"keramik"
+THEME = "darkly"
 
 
 class AppManager:
-    def __init__(self, root, *args, **kwargs):
+    def __init__(self, root):
         self.tools = PasswordTools()
         self.data = Data()
         self.selected_item = None
         self.main_window = root
         self.main_window.title("Password Manager")
-        self.main_window.geometry("1200x800")
+        self.main_window.geometry("1800x1000")
 
         self.menubar_main(self.main_window)
 
@@ -25,53 +23,74 @@ class AppManager:
         self.welcome = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
         self.key_loading = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
         self.password_manager = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
+        self.password_generator = ttk.Frame(self.main_window, width=200, height=200, borderwidth=10, relief=GROOVE)
 
         self.welcome_screen_button = ttk.Button(self.sidebar, text="Welcome", command=lambda: self.welcome_screen(self.welcome), width=30)
         self.welcome_screen_button.pack(side="top")
-        self.key_loading_screen_button = ttk.Button(self.sidebar, text="Key Management", command=lambda: self.key_loading_screen(self.key_loading), width=30)
+        self.key_loading_screen_button = ttk.Button(self.sidebar, text="Key Manager", command=lambda: self.key_loading_screen(self.key_loading), width=30)
         self.key_loading_screen_button.pack(side="top")
-        self.password_manager_screen_button = ttk.Button(self.sidebar, text="Password Manager", command=lambda: self.password_manager_screen(self.password_manager), width=30)
-        self.password_manager_screen_button.pack(side="top")
 
         self.sidebar.pack(side="left", fill="y")
-        self.key_loading.pack(side="left", fill="both", expand=True)
-
         self.welcome_screen(self.welcome)
-        self.apply_theme(root)
+        self.apply_theme()
 
     def welcome_screen(self, frame):
-        self.password_manager.pack_forget()
         self.key_loading.pack_forget()
+        self.password_manager.pack_forget()
+        self.password_generator.pack_forget()
         self.welcome.pack(side="left", fill="both", expand=True)
 
         self.canvas = Canvas(frame, width=200, height=200, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
         self.canvas.create_image(100, 100, image=self.picture_png)
-        self.canvas.place(relx=0.39, rely=0.3)
+        self.canvas.place(relx=0.44, rely=0.4)
 
         self.label_welcome = ttk.Label(frame, text="Welcome to MyPass", font=("Arial", 30))
-        self.label_welcome.place(relx=0.32, rely=0.2)
+        self.label_welcome.place(relx=0.38, rely=0.3)
 
     def key_loading_screen(self, frame):
         self.welcome.pack_forget()
         self.password_manager.pack_forget()
+        self.password_generator.pack_forget()
         self.key_loading.pack(side="left", fill="both", expand=True)
 
-        self.label = ttk.Label(frame, text="Load or create a Keyfile.")
-        self.label.place(relx=0.5, rely=0.25, relwidth=0.5, relheight=0.25, anchor="center")
+        self.label_title = ttk.Label(frame, text="Key Manager")
+        self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
+        self.label_title["style"] = "label_title.TLabel"
 
-        self.load_button = ttk.Button(frame, text="Load", command=self.button_pushed_load_key, width=10)
-        self.load_button.place(relx=0.25, rely=0.5, anchor="center")
+        self.label_info = ttk.Label(frame, text="This is where you create or load your key to decrypt your saved "
+                                                 "passwords.\nImportant: Do not lose the key file, otherwise you will "
+                                                 "no longer be able to access your passwords.")
+        self.label_info.place(relx=0.5, rely=0.2, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.create_button = ttk.Button(frame, text="Create key file", command=self.button_pushed_create_key_file, width=10)
-        self.create_button.place(relx=0.75, rely=0.5, anchor="center")
+        self.label_no_key = ttk.Label(frame, text="No Keyfile: ")
+        self.label_no_key.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.label_load_key = ttk.Label(frame, text="Load Keyfile: ")
+        self.label_load_key.place(relx=0.5, rely=0.4, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.label_filepath = ttk.Label(frame, text="Filepath: ")
+        self.label_filepath.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.create_button = ttk.Button(frame, text="Create Keyfile", command=self.button_pushed_create_key_file, width=40)
+        self.create_button.place(relx=0.52, rely=0.3, anchor="center")
+
+        self.load_button = ttk.Button(frame, text="Load", command=self.button_pushed_load_key, width=40)
+        self.load_button.place(relx=0.52, rely=0.4, anchor="center")
+
+        self.pathfile_entry = ttk.Entry(frame, width=75)
+        self.pathfile_entry.place(relx=0.52, rely=0.5, anchor="center")
 
     def password_manager_screen(self, frame):
         self.welcome.pack_forget()
         self.key_loading.pack_forget()
+        self.password_generator.pack_forget()
         self.password_manager.pack(side="left", fill="both", expand=True)
 
-        # Create Widgets for App_window
+        self.label_title = ttk.Label(frame, text="Password Manager")
+        self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
+        self.label_title["style"] = "label_title.TLabel"
+
         self.label_website = ttk.Label(frame, text="Website/URL: ", width=18)
         self.label_website.grid(row=2, column=2, sticky="e")
 
@@ -124,6 +143,16 @@ class AppManager:
 
         self.check_security_status()
 
+    def password_generator_screen(self, frame):
+        self.welcome.pack_forget()
+        self.key_loading.pack_forget()
+        self.password_manager.pack_forget()
+        self.password_generator.pack(side="left", fill="both", expand=True)
+
+        self.label_title = ttk.Label(frame, text="Key Generator")
+        self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
+        self.label_title["style"] = "label_title.TLabel"
+
     def menubar_main(self, root):
         self.data_menu = Menu(root)
 
@@ -144,28 +173,28 @@ class AppManager:
         self.data_menu.add_cascade(label="Key Management", menu=self.key)
         self.main_window.config(menu=self.data_menu)
 
-    def apply_theme(self, frame):
+    def apply_theme(self):
         try:
-            # Create a Style instance
             style = Style()
-
-            # Set the theme
             style.theme_use(THEME)
-
-            # Apply the style to elements
             frame_style = style.lookup('TFrame', 'background')
             label_style = style.lookup('TLabel', 'background')
-
-            # Configure the main_window and canvas with the obtained styles
+            style.configure('label_title.TLabel', font=('Arial', 30))
+            style.configure('TButton', font=('Arial', 15))
+            style.configure('TLabel', font=('Arial', 15))
+            style.configure('TEntry', font=('Arial', 15))
             self.main_window.config(bg=frame_style)
             self.canvas.config(bg=label_style)
-
-            # self.style = ThemedStyle(frame)
-            # self.style.set_theme(THEME)
-            # self.main_window.config(bg=self.style.lookup('TFrame', 'background'))
-            # self.canvas.config(bg=self.style.lookup('TLabel', 'background'))
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+    def sidebar_show_buttons(self):
+        if len(self.data.key_path) > 0:
+            if not hasattr(self, 'password_manager_screen_button') or not isinstance(self.password_manager_screen_button, ttk.Button):
+                self.password_manager_screen_button = ttk.Button(self.sidebar, text="Password Manager", command=lambda: self.password_manager_screen(self.password_manager), width=30)
+                self.password_manager_screen_button.pack(side="top")
+                self.password_generator_screen_button = ttk.Button(self.sidebar, text="Password Generator", command=lambda: self.password_generator_screen(self.password_generator), width=30)
+                self.password_generator_screen_button.pack(side="top")
 
     def check_security_status(self):
         try:
@@ -302,6 +331,8 @@ class AppManager:
         try:
             key_value = self.data.load_key_file()
             status = self.tools.insert_security_key(key_value)
+            self.pathfile_entry.insert(END, string=self.data.key_path)
+            self.sidebar_show_buttons()
             if status:
                 return True
         except Exception as error:
@@ -313,8 +344,8 @@ class AppManager:
             create_key = self.tools.generate_security_key()
             self.data.create_key_file(create_key)
             status = self.tools.insert_security_key(create_key)
-            messagebox.showinfo(title="Important!", message="Remember: Losing your Keyfile means no way to "
-                                                            "decrypt your passwords.")
+            self.pathfile_entry.insert(END, string=self.data.key_path)
+            self.sidebar_show_buttons()
             if status:
                 return True
         except Exception as error:
