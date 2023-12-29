@@ -7,7 +7,7 @@ from data import Data
 import pyperclip
 import json
 
-THEME ="darkly" #"keramik"
+THEME ="superhero" #"keramik"
 
 
 class AppManager:
@@ -45,7 +45,7 @@ class AppManager:
         self.welcome.pack(side="left", fill="both", expand=True)
 
         self.canvas = Canvas(frame, width=200, height=200, highlightthickness=0)
-        self.picture_png = PhotoImage(file="logo.png")
+        self.picture_png = PhotoImage(file="Day29/Password_manager/logo.png")
         self.canvas.create_image(100, 100, image=self.picture_png)
         self.canvas.place(relx=0.39, rely=0.3)
 
