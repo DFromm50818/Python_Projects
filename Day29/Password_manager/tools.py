@@ -9,10 +9,10 @@ class PasswordTools:
         self.cipher_suite = None
 
     def password_check(self, password):
-        digits = ''.join(filter(str.isdigit, password))
-        letter_lower = ''.join(filter(str.islower, password))
-        letter_upper = ''.join(filter(str.isupper, password))
-        symbols = ''.join(filter(lambda x: not x.isalnum(), password))
+        digits = "".join(filter(str.isdigit, password))
+        letter_lower = "".join(filter(str.islower, password))
+        letter_upper = "".join(filter(str.isupper, password))
+        symbols = "".join(filter(lambda x: not x.isalnum(), password))
         conditions = [
             len(digits) >= 3 and len(symbols) >= 3 and len(letter_upper) >= 4 and len(letter_lower) >= 4,
             len(digits) >= 2 and len(symbols) >= 2 and len(letter_upper) >= 3 and len(letter_lower) >= 3
@@ -20,13 +20,20 @@ class PasswordTools:
         self.light = "strong" if any(conditions) else "medium" if password else "weak"
         return self.light
 
-    def generate_password(self):
+    def generate_password(self, length):
+        password_length = length
+        uppercase = int(round(float(password_length / 4)))
+        lowercase = int(round(float(password_length / 4)))
+        number = int(round(float(password_length / 4)))
+        special = int(round(float(password_length / 4)))
+
         pw_categories = [
-            (string.ascii_uppercase, randint(5, 10)),
-            (string.ascii_lowercase, randint(5, 10)),
-            (string.digits, randint(4, 8)),
-            (string.punctuation, randint(4, 8))
+            (string.ascii_uppercase, uppercase),
+            (string.ascii_lowercase, lowercase),
+            (string.digits, number),
+            (string.punctuation, special)
         ]
+        print(pw_categories)
         pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
         shuffle(pw_new)
         pw_user = "".join(pw_new)

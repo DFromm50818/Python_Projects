@@ -10,6 +10,15 @@ THEME = "darkly"
 
 class AppManager:
     def __init__(self, root):
+        self.website = None
+        self.user = None
+        self.pw = None
+
+        self.int_number = 8
+        self.var_capital = tk.StringVar()
+        self.var_lowercase = tk.StringVar()
+        self.var_numbers = tk.StringVar()
+        self.var_special = tk.StringVar()
         self.tools = PasswordTools()
         self.data = Data()
         self.selected_item = None
@@ -58,10 +67,8 @@ class AppManager:
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
 
-        self.label_info = ttk.Label(frame, text="This is where you create or load your key to decrypt your saved "
-                                                 "passwords.\nImportant: Do not lose the key file, otherwise you will "
-                                                 "no longer be able to access your passwords.")
-        self.label_info.place(relx=0.5, rely=0.2, relwidth=0.5, relheight=0.1, anchor="center")
+        self.label_info = ttk.Label(frame, text="This is where you create or load your key to decrypt your saved passwords.\nImportant: Do not lose the key file, otherwise you will no longer be able to \naccess your passwords.")
+        self.label_info.place(relx=0.5, rely=0.15, relwidth=0.5, relheight=0.5, anchor="center")
 
         self.label_no_key = ttk.Label(frame, text="No Keyfile: ")
         self.label_no_key.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
@@ -78,8 +85,11 @@ class AppManager:
         self.load_button = ttk.Button(frame, text="Load", command=self.button_pushed_load_key, width=40)
         self.load_button.place(relx=0.52, rely=0.4, anchor="center")
 
-        self.pathfile_entry = ttk.Entry(frame, width=75)
+        self.pathfile_entry = ttk.Entry(frame, width=74)
         self.pathfile_entry.place(relx=0.52, rely=0.5, anchor="center")
+
+        self.pathfile_copy_button = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.pathfile_entry.get()), width=7)
+        self.pathfile_copy_button.place(relx=0.73, rely=0.5, anchor="center")
 
     def password_manager_screen(self, frame):
         self.welcome.pack_forget()
@@ -91,55 +101,51 @@ class AppManager:
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
 
-        self.label_website = ttk.Label(frame, text="Website/URL: ", width=18)
-        self.label_website.grid(row=2, column=2, sticky="e")
+        self.label_load_item = ttk.Label(frame, text="Saved Passwords: ")
+        self.label_load_item.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.entry_website = ttk.Entry(frame, width=58)
-        self.entry_website.grid(row=2, column=3, columnspan=2, sticky="w")
-        self.entry_website.focus()
-
-        self.label_user = ttk.Label(frame, text="Login: ", width=18)
-        self.label_user.grid(row=3, column=2, sticky="e")
-
-        self.entry_user = ttk.Entry(frame, width=58)
-        self.entry_user.grid(row=3, column=3, columnspan=2, sticky="w")
-
-        self.label_pw = ttk.Label(frame, text="Password: ", width=18)
-        self.label_pw.grid(row=4, column=2, sticky="e")
-
-        self.entry_pw = ttk.Entry(frame, width=58)
-        self.entry_pw.grid(row=4, column=3, columnspan=2, sticky="w")
-
-        self.label_secure = ttk.Label(frame, text="Password secure? ", width=18)
-        self.label_secure.grid(row=5, column=2, sticky="e")
-
-        self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.get()), width=6)
-        self.button_copy_website.grid(row=2, column=5, sticky="w")
-
-        self.button_copy_user = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_user.get()), width=6)
-        self.button_copy_user.grid(row=3, column=5, sticky="w")
-
-        self.button_copy_pw = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_pw.get()), width=6)
-        self.button_copy_pw.grid(row=4, column=5, sticky="w")
-
-        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.entry_pw.insert(END, string=self.insert_generated_password_entry_pw()))
-        self.button_gen_pw.grid(row=6, column=3, sticky="w")
-
-        self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
-        self.button_add.grid(row=6, column=4, sticky="w")
-
-        self.combobox = ttk.Combobox(frame, width=55, postcommand=self.combobox_load_options)
-        self.combobox.grid(row=1, column=3, columnspan=2, sticky="w")
+        self.combobox = ttk.Combobox(frame, width=56, postcommand=self.combobox_load_options)
+        self.combobox.place(relx=0.52, rely=0.3, anchor="center")
         self.combobox.bind("<<ComboboxSelected>>", self.on_combobox_select)
 
-        self.label_load_item = ttk.Label(frame, text="Saved Passwords: ", width=18)
-        self.label_load_item.grid(row=1, column=2, sticky="e")
+        self.label_website = ttk.Label(frame, text="Website/URL: ", width=18)
+        self.label_website.place(relx=0.5, rely=0.4, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.entry_website = ttk.Entry(frame, width=58)
+        self.entry_website.place(relx=0.52, rely=0.4, anchor="center")
+
+        self.label_user = ttk.Label(frame, text="Login: ", width=18)
+        self.label_user.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.entry_user = ttk.Entry(frame, width=58)
+        self.entry_user.place(relx=0.52, rely=0.5, anchor="center")
+
+        self.label_pw = ttk.Label(frame, text="Password: ", width=18)
+        self.label_pw.place(relx=0.5, rely=0.6, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.entry_pw = ttk.Entry(frame, width=58)
+        self.entry_pw.place(relx=0.52, rely=0.6, anchor="center")
+
+        self.label_secure = ttk.Label(frame, text="Password secure? ", width=18)
+        self.label_secure.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
 
         self.label_security_step = ttk.Label(frame)
-        self.label_security_step.grid(row=5, column=3, sticky="w")
+        self.label_security_step.place(relx=0.65, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.label_error = ttk.Label(frame, width=120)
-        self.label_error.grid(row=7, column=0, columnspan=5)
+        self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.get()), width=6)
+        self.button_copy_website.place(relx=0.7, rely=0.4, anchor="center")
+
+        self.button_copy_user = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_user.get()), width=6)
+        self.button_copy_user.place(relx=0.7, rely=0.5, anchor="center")
+
+        self.button_copy_pw = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_pw.get()), width=6)
+        self.button_copy_pw.place(relx=0.7, rely=0.6, anchor="center")
+
+        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.entry_pw.insert(END, string=self.insert_generated_password_entry_pw()))
+        self.button_gen_pw.place(relx=0.34, rely=0.8, anchor="center")
+
+        self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
+        self.button_add.place(relx=0.637, rely=0.8, anchor="center")
 
         self.check_security_status()
 
@@ -153,12 +159,53 @@ class AppManager:
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
 
+        self.label_pw = ttk.Label(frame, text="New Password: ", width=18)
+        self.label_pw.place(relx=0.5, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
+
+        self.entry_pw = ttk.Entry(frame, width=58)
+        self.entry_pw.place(relx=0.52, rely=0.3, anchor="center")
+
+        self.check_pw_optionen_capital = ttk.Checkbutton(frame, command=self.show_selected_checkmark_capital)
+        self.check_pw_optionen_capital.place(relx=0.36, rely=0.4, anchor="center")
+
+        self.check_pw_optionen_lowercase = ttk.Checkbutton(frame, command=self.show_selected_checkmark_lowercase)
+        self.check_pw_optionen_lowercase.place(relx=0.52, rely=0.4, anchor="center")
+
+        self.check_pw_optionen_numbers = ttk.Checkbutton(frame, command=self.show_selected_checkmark_numbers)
+        self.check_pw_optionen_numbers.place(relx=0.36, rely=0.5, anchor="center")
+
+        self.check_pw_optionen_special = ttk.Checkbutton(frame, command=self.show_selected_checkmark_special)
+        self.check_pw_optionen_special.place(relx=0.52, rely=0.5, anchor="center")
+
+        self.label_capital = ttk.Label(frame, text="Capital letter", width=18)
+        self.label_capital.place(relx=0.44, rely=0.4, anchor="center")
+
+        self.label_lower_case = ttk.Label(frame, text="Lower case letter", width=18)
+        self.label_lower_case.place(relx=0.6, rely=0.4, anchor="center")
+
+        self.label_numbers = ttk.Label(frame, text="Numbers", width=18)
+        self.label_numbers.place(relx=0.44, rely=0.5, anchor="center")
+
+        self.label_special = ttk.Label(frame, text="Special characters", width=18)
+        self.label_special.place(relx=0.6, rely=0.5, anchor="center")
+
+        self.password_length_slider = ttk.Scale(frame, from_=8, to=40, command=self.on_scale_change)
+        self.password_length_slider.place(relx=0.5, rely=0.6, relwidth=0.3, anchor="center")
+
+        self.label_password_length = ttk.Label(frame, text="Password length: ", width=18)
+        self.label_password_length.place(relx=0.5, rely=0.62, anchor="center")
+
+        self.label_password_length_screen = ttk.Label(frame, text="8", width=18)
+        self.label_password_length_screen.place(relx=0.62, rely=0.62, anchor="center")
+
+        self.button_gen_pw = ttk.Button(frame, width=30, text="Generate Password", command=lambda: self.insert_generated_password_entry_pw())
+        self.button_gen_pw.place(relx=0.5, rely=0.8, anchor="center")
+
     def menubar_main(self, root):
         self.data_menu = Menu(root)
 
         self.menu = Menu(self.data_menu, tearoff=0)
         self.menu.add_command(label="Load File", command=self.button_pushed_load_file)
-        self.menu.add_command(label="Load Key", command=self.button_pushed_load_key)
         self.menu.add_command(label="Exit", command=self.exit_program)
         self.data_menu.add_cascade(label="File", menu=self.menu)
 
@@ -166,27 +213,44 @@ class AppManager:
         self.item.add_command(label="Clean Fields", command=self.clear_all_entries)
         self.item.add_command(label="Delete Password", command=self.delete_data_from_file)
         self.data_menu.add_cascade(label="Data", menu=self.item)
-
-        self.key = Menu(self.data_menu, tearoff=0)
-        self.key.add_command(label="Load Keyfile", command=self.button_pushed_load_key)
-        self.key.add_command(label="Create Keyfile", command=self.button_pushed_create_key_file)
-        self.data_menu.add_cascade(label="Key Management", menu=self.key)
         self.main_window.config(menu=self.data_menu)
 
     def apply_theme(self):
         try:
             style = Style()
             style.theme_use(THEME)
-            frame_style = style.lookup('TFrame', 'background')
-            label_style = style.lookup('TLabel', 'background')
+            # frame_style = style.lookup('TFrame', 'background')
+            # label_style = style.lookup('TLabel', 'background')
             style.configure('label_title.TLabel', font=('Arial', 30))
             style.configure('TButton', font=('Arial', 15))
             style.configure('TLabel', font=('Arial', 15))
-            style.configure('TEntry', font=('Arial', 15))
-            self.main_window.config(bg=frame_style)
-            self.canvas.config(bg=label_style)
+            style.configure('TEntry', font=('Arial', 15), padding=[9])
+            style.configure('TCombobox', font=('Arial', 15), padding=[9])
+            # self.main_window.config(bg=frame_style)
+            # self.canvas.config(bg=label_style)
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+    def on_scale_change(self, value):
+        self.int_number = int(float(value))
+        self.label_password_length_screen.config(text=f"{self.int_number}")
+        return self.int_number
+
+    def show_selected_checkmark_capital(self):
+        selection = self.var_capital.get()
+        print(f"Selected option: {selection}")
+
+    def show_selected_checkmark_lowercase(self):
+        selection = self.var_lowercase.get()
+        print(f"Selected option: {selection}")
+
+    def show_selected_checkmark_numbers(self):
+        selection = self.var_numbers.get()
+        print(f"Selected option: {selection}")
+
+    def show_selected_checkmark_special(self):
+        selection = self.var_special.get()
+        print(f"Selected option: {selection}")
 
     def sidebar_show_buttons(self):
         if len(self.data.key_path) > 0:
@@ -205,20 +269,16 @@ class AppManager:
 
     def no_file_found(self):
         try:
-            file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file "
-                                                                                    "press Ok or load a file "
-                                                                                    "press Cancel")
+            file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file press Ok or load a file press Cancel")
             if file_not_found:
                 self.data.create_file()
             else:
                 self.button_pushed_load_file()
         except Exception as error:
-            self.label_error.config(text=f"An error occurred {error}")
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def exit_program(self):
-        response = messagebox.askokcancel(title="Quit program? ",
-                                          message=f"All unsaved Data are lost.")
+        response = messagebox.askokcancel(title="Quit program? ", message=f"All unsaved Data are lost.")
         if response:
             exit()
         else:
@@ -281,13 +341,14 @@ class AppManager:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def insert_generated_password_entry_pw(self):
-        try:
+        # try:
             self.entry_pw.delete(0, END)
-            pw = self.tools.generate_password()
+            pw_length = self.on_scale_change(self.int_number)
+            pw = self.tools.generate_password(pw_length)
             if len(pw) != 0:
-                return pw
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+                self.entry_pw.insert(tk.END, pw)
+        # except Exception as error:
+            # messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def security_light_update(self, light_status):
         try:
