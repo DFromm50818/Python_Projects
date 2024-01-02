@@ -22,7 +22,7 @@ class PasswordTools:
 
     def generate_password(self, length, options):
         character_options = 0
-        empty_char = length % character_options
+        # empty_char = length % character_options
         for num in options:
             character_options += num
             
