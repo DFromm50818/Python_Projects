@@ -13,17 +13,18 @@ class AppManager:
         self.website = None
         self.user = None
         self.pw = None
+        self.pw_options_list = [1, 1, 1, 1]
 
         self.int_number = 8
-        self.var_capital = tk.StringVar()
-        self.var_lowercase = tk.StringVar()
-        self.var_numbers = tk.StringVar()
-        self.var_special = tk.StringVar()
+        self.var_capital = IntVar(value=1)
+        self.var_lowercase = IntVar(value=1)
+        self.var_numbers = IntVar(value=1)
+        self.var_special = IntVar(value=1)
         self.tools = PasswordTools()
         self.data = Data()
         self.selected_item = None
         self.main_window = root
-        self.main_window.title("Password Manager")
+        self.main_window.title("NightWardenKey")
         self.main_window.geometry("1800x1000")
 
         self.menubar_main(self.main_window)
@@ -54,8 +55,8 @@ class AppManager:
         self.canvas.create_image(100, 100, image=self.picture_png)
         self.canvas.place(relx=0.44, rely=0.4)
 
-        self.label_welcome = ttk.Label(frame, text="Welcome to MyPass", font=("Arial", 30))
-        self.label_welcome.place(relx=0.38, rely=0.3)
+        self.label_welcome = ttk.Label(frame, text="Welcome to NightWardenKey", font=("Arial", 30))
+        self.label_welcome.place(relx=0.32, rely=0.3)
 
     def key_loading_screen(self, frame):
         self.welcome.pack_forget()
@@ -165,16 +166,16 @@ class AppManager:
         self.entry_pw = ttk.Entry(frame, width=58)
         self.entry_pw.place(relx=0.52, rely=0.3, anchor="center")
 
-        self.check_pw_optionen_capital = ttk.Checkbutton(frame, command=self.show_selected_checkmark_capital)
+        self.check_pw_optionen_capital = ttk.Checkbutton(frame, command=self.show_selected_checkmark_capital, variable=self.var_capital)
         self.check_pw_optionen_capital.place(relx=0.36, rely=0.4, anchor="center")
 
-        self.check_pw_optionen_lowercase = ttk.Checkbutton(frame, command=self.show_selected_checkmark_lowercase)
+        self.check_pw_optionen_lowercase = ttk.Checkbutton(frame, command=self.show_selected_checkmark_lowercase, variable=self.var_lowercase)
         self.check_pw_optionen_lowercase.place(relx=0.52, rely=0.4, anchor="center")
 
-        self.check_pw_optionen_numbers = ttk.Checkbutton(frame, command=self.show_selected_checkmark_numbers)
+        self.check_pw_optionen_numbers = ttk.Checkbutton(frame, command=self.show_selected_checkmark_numbers, variable=self.var_numbers)
         self.check_pw_optionen_numbers.place(relx=0.36, rely=0.5, anchor="center")
 
-        self.check_pw_optionen_special = ttk.Checkbutton(frame, command=self.show_selected_checkmark_special)
+        self.check_pw_optionen_special = ttk.Checkbutton(frame, command=self.show_selected_checkmark_special, variable=self.var_special)
         self.check_pw_optionen_special.place(relx=0.52, rely=0.5, anchor="center")
 
         self.label_capital = ttk.Label(frame, text="Capital letter", width=18)
@@ -238,18 +239,21 @@ class AppManager:
 
     def show_selected_checkmark_capital(self):
         selection = self.var_capital.get()
-        print(f"Selected option: {selection}")
+        self.pw_options_list[0] = selection
 
     def show_selected_checkmark_lowercase(self):
         selection = self.var_lowercase.get()
+        self.pw_options_list[1] = selection
         print(f"Selected option: {selection}")
 
     def show_selected_checkmark_numbers(self):
         selection = self.var_numbers.get()
+        self.pw_options_list[2] = selection
         print(f"Selected option: {selection}")
 
     def show_selected_checkmark_special(self):
         selection = self.var_special.get()
+        self.pw_options_list[3] = selection
         print(f"Selected option: {selection}")
 
     def sidebar_show_buttons(self):
@@ -337,6 +341,7 @@ class AppManager:
             self.entry_website.insert(END, string=website)
             self.entry_user.insert(END, string=user)
             self.entry_pw.insert(END, string=password)
+            self.show_selected_checkmark_capital()
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
@@ -344,7 +349,9 @@ class AppManager:
         # try:
             self.entry_pw.delete(0, END)
             pw_length = self.on_scale_change(self.int_number)
-            pw = self.tools.generate_password(pw_length)
+            pw_options = self.pw_options_list
+            print(pw_options)
+            pw = self.tools.generate_password(pw_length, pw_options)
             if len(pw) != 0:
                 self.entry_pw.insert(tk.END, pw)
         # except Exception as error:

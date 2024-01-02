@@ -20,13 +20,16 @@ class PasswordTools:
         self.light = "strong" if any(conditions) else "medium" if password else "weak"
         return self.light
 
-    def generate_password(self, length):
-        password_length = length
-        uppercase = int(round(float(password_length / 4)))
-        lowercase = int(round(float(password_length / 4)))
-        number = int(round(float(password_length / 4)))
-        special = int(round(float(password_length / 4)))
-
+    def generate_password(self, length, options):
+        character_options = 0
+        for num in options:
+            character_options += num
+        uppercase = int(float(length / character_options)) * options[0]
+        lowercase = int(float(length / character_options)) * options[1]
+        number = int(float(length / character_options)) * options[2]
+        special = int(float(length / character_options)) * options[3]
+        # if length > len(uppercase) + len(lowercase) + len(number) + len(special):
+        #     length % character_options
         pw_categories = [
             (string.ascii_uppercase, uppercase),
             (string.ascii_lowercase, lowercase),
