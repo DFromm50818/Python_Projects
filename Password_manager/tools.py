@@ -22,20 +22,26 @@ class PasswordTools:
 
     def generate_password(self, length, options):
         character_options = 0
-        # empty_char = length % character_options
+        uppercase = None
+        lowercase = None
+        number = None
+        special = None
+
         for num in options:
             character_options += num
-            
-
-        uppercase = int(float(length / character_options)) * options[0]
-        lowercase = int(float(length / character_options)) * options[1]
-        number = int(float(length / character_options)) * options[2]
-        special = int(float(length / character_options)) * options[3]
+        remaining_length = length % character_options
+        letter_list = [uppercase, lowercase, number, special]
+        letter_list[0] = int(float(length / character_options)) * options[0]
+        letter_list[1] = int(float(length / character_options)) * options[1]
+        letter_list[2] = int(float(length / character_options)) * options[2]
+        letter_list[3] = int(float(length / character_options)) * options[3]
+        options_index = next(index for index, value in enumerate(letter_list) if value > 0)
+        letter_list[options_index] += remaining_length
         pw_categories = [
-            (string.ascii_uppercase, uppercase),
-            (string.ascii_lowercase, lowercase),
-            (string.digits, number),
-            (string.punctuation, special)
+            (string.ascii_uppercase, letter_list[0]),
+            (string.ascii_lowercase, letter_list[1]),
+            (string.digits, letter_list[2]),
+            (string.punctuation, letter_list[3])
         ]
         print(pw_categories)
         pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
