@@ -9,8 +9,6 @@ import string
 class Data:
     def __init__(self):
         self.website_option = []
-        self.light = "grey"
-        self.cipher_suite = None
         self.file_path = ""
         self.json_data_path = False
         self.key_path = ""
@@ -59,6 +57,12 @@ class Data:
                 encrypted_key = file.read()
             return encrypted_key
 
+
+class PasswordTools:
+    def __init__(self):
+        self.light = "weak"
+        self.cipher_suite = None
+
     def password_check(self, password):
         digits = "".join(filter(str.isdigit, password))
         letter_lower = "".join(filter(str.islower, password))
@@ -77,7 +81,6 @@ class Data:
         lowercase = None
         number = None
         special = None
-
         for num in options:
             character_options += num
         remaining_length = length % character_options
@@ -94,21 +97,10 @@ class Data:
             (string.digits, letter_list[2]),
             (string.punctuation, letter_list[3])
         ]
-        print(pw_categories)
         pw_new = [choice(category) for category, count in pw_categories for _ in range(count)]
         shuffle(pw_new)
         pw_user = "".join(pw_new)
         return pw_user
-
-    # def encrypt_data(self, data):
-    #     encrypted_data = self.cipher_suite.encrypt(data.encode())
-    #     return encrypted_data
-    #
-    # def decrypt_data(self, encrypt_data):
-    #     if self.cipher_suite is not None:
-    #         return self.cipher_suite.decrypt(encrypt_data).decode('utf-8')
-    #     else:
-    #         raise ValueError("Cipher Suite nicht initialisiert oder ungültig")
 
     def encrypt_data(self, data):
         encrypted_data = self.cipher_suite.encrypt(data.encode())
@@ -119,9 +111,6 @@ class Data:
         byte_format_data = encrypt_data.encode('utf-8')
         if self.cipher_suite is not None:
             return self.cipher_suite.decrypt(byte_format_data)
-        else:
-            raise ValueError("Cipher Suite nicht initialisiert oder ungültig")
-        # return self.cipher_suite.decrypt(byte_format_data)
 
     def generate_security_key(self):
         key = Fernet.generate_key()
