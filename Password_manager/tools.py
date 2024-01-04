@@ -49,14 +49,14 @@ class PasswordTools:
         pw_user = "".join(pw_new)
         return pw_user
 
-    def encrypt_password(self, password):
-        encrypted_pw = self.cipher_suite.encrypt(password.encode())
-        json_encrypt_pw = encrypted_pw.decode('utf-8')
-        return json_encrypt_pw
+    def encrypt_data(self, data):
+        encrypted_data = self.cipher_suite.encrypt(data.encode())
+        json_encrypt_data = encrypted_data.decode('utf-8')
+        return json_encrypt_data
 
-    def decrypt_password(self, encrypt_pw):
-        byte_format_password = encrypt_pw.encode('utf-8')
-        return self.cipher_suite.decrypt(byte_format_password)
+    def decrypt_data(self, encrypt_data):
+        byte_format_data = encrypt_data.encode('utf-8')
+        return self.cipher_suite.decrypt(byte_format_data)
 
     def generate_security_key(self):
         key = Fernet.generate_key()

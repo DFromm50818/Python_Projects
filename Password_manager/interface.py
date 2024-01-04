@@ -13,6 +13,7 @@ class AppManager:
         self.website = None
         self.user = None
         self.pw = None
+        self.key_path = None
         self.pw_options_list = [1, 1, 1, 1]
 
         self.int_number = 8
@@ -142,8 +143,8 @@ class AppManager:
         self.button_copy_pw = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_pw.get()), width=6)
         self.button_copy_pw.place(relx=0.7, rely=0.6, anchor="center")
 
-        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.entry_pw.insert(END, string=self.insert_generated_password_entry_pw()))
-        self.button_gen_pw.place(relx=0.34, rely=0.8, anchor="center")
+        # self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.entry_pw.insert(END, string=self.insert_generated_password_entry_pw()))
+        # self.button_gen_pw.place(relx=0.34, rely=0.8, anchor="center")
 
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
         self.button_add.place(relx=0.637, rely=0.8, anchor="center")
@@ -244,17 +245,14 @@ class AppManager:
     def show_selected_checkmark_lowercase(self):
         selection = self.var_lowercase.get()
         self.pw_options_list[1] = selection
-        print(f"Selected option: {selection}")
 
     def show_selected_checkmark_numbers(self):
         selection = self.var_numbers.get()
         self.pw_options_list[2] = selection
-        print(f"Selected option: {selection}")
 
     def show_selected_checkmark_special(self):
         selection = self.var_special.get()
         self.pw_options_list[3] = selection
-        print(f"Selected option: {selection}")
 
     def sidebar_show_buttons(self):
         if len(self.data.key_path) > 0:
@@ -290,19 +288,21 @@ class AppManager:
 
     def combobox_load_options(self):
         try:
-            self.combobox["values"] = self.data.load_website_options()
+            websites = self.data.load_website_options()
+            self.combobox["values"] = websites
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def button_pushed_save_data(self, website, user, password):
         try:
-            password_encrypt = self.tools.encrypt_password(password)
-            if not all([website, user, password, password_encrypt]):
+            user_encrypt = self.data.encrypt_data(user)
+            password_encrypt = self.data.encrypt_data(password)
+            if not all([website, user, password, password]):
                 return messagebox.showerror(title="Error!", message="The data could not be saved. "
                                                                     "Please fill out all entries.")
             if self.data.json_data_path is False:
                 self.no_file_found()
-            self.data.save_new_data(website, user, password_encrypt)
+            self.data.save_new_data(website, user_encrypt, password_encrypt)
             messagebox.showinfo(title="Success!", message=f"Website/URL: {website} \nLogin: {user} \nPassword: "
                                                           f"{password} saved successfully.")
             self.clear_all_entries()
@@ -322,40 +322,43 @@ class AppManager:
     def on_combobox_select(self, event):
         try:
             selected_value = event.widget.get()
+            print(self.data.read_file)
             for item in self.data.read_file:
                 for key, value in item.items():
                     if key == "Website/URL" and selected_value in value:
                         website_show = item["Website/URL"]
                         user_show = item["Login"]
                         pw_show = item["Password"]
-                        self.selected_item = item
-                        encrypted_pw = self.tools.decrypt_password(pw_show)
-                        self.insert_text_to_entries(website_show, user_show, encrypted_pw)
+                        self.selected_item = item#
+                        encrypted_user = self.data.decrypt_data(user_show)
+                        encrypted_pw = self.data.decrypt_data(pw_show)
+                        self.insert_text_to_entries(website_show, encrypted_user, encrypted_pw)
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def insert_text_to_entries(self, website, user, password):
+    def insert_text_to_entries(self, website, encrypted_user, encrypted_password):
         try:
             if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
                 self.clear_all_entries()
+            decrypted_user = self.tools.decrypt_data(encrypted_user)
+            decrypted_password = self.tools.decrypt_data(encrypted_password)
             self.entry_website.insert(END, string=website)
-            self.entry_user.insert(END, string=user)
-            self.entry_pw.insert(END, string=password)
+            self.entry_user.insert(END, string=decrypted_user)
+            self.entry_pw.insert(END, string=decrypted_password)
             self.show_selected_checkmark_capital()
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def insert_generated_password_entry_pw(self):
-        # try:
+        try:
             self.entry_pw.delete(0, END)
             pw_length = self.on_scale_change(self.int_number)
             pw_options = self.pw_options_list
-            print(pw_options)
-            pw = self.tools.generate_password(pw_length, pw_options)
+            pw = self.data.generate_password(pw_length, pw_options)
             if len(pw) != 0:
                 self.entry_pw.insert(tk.END, pw)
-        # except Exception as error:
-            # messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def security_light_update(self, light_status):
         try:
@@ -398,24 +401,24 @@ class AppManager:
     def button_pushed_load_key(self):
         try:
             key_value = self.data.load_key_file()
-            status = self.tools.insert_security_key(key_value)
+            status = self.data.insert_security_key(key_value)
             self.pathfile_entry.insert(END, string=self.data.key_path)
+            self.key_path = self.pathfile_entry.get()
             self.sidebar_show_buttons()
             if status:
                 return True
         except Exception as error:
-            return None
-            # messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def button_pushed_create_key_file(self):
         try:
-            create_key = self.tools.generate_security_key()
+            create_key = self.data.generate_security_key()
             self.data.create_key_file(create_key)
-            status = self.tools.insert_security_key(create_key)
+            status = self.data.insert_security_key(create_key)
             self.pathfile_entry.insert(END, string=self.data.key_path)
+            self.key_path = self.pathfile_entry.get()
             self.sidebar_show_buttons()
             if status:
                 return True
         except Exception as error:
-            # return None
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
