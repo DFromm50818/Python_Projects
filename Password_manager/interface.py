@@ -1,7 +1,6 @@
 from tkinter import messagebox
 from ttkbootstrap import *
 import data
-# from tools import PasswordTools
 import pyperclip
 import json
 
@@ -10,10 +9,10 @@ THEME = "darkly"
 
 class AppManager:
     def __init__(self, root):
-        self.website = ""
-        self.user = ""
-        self.pw = ""
-        self.key_path = ""
+        self.website_cache = ""
+        self.user_cache = ""
+        self.pw_cache = ""
+        self.key_path_cache = ""
         self.pw_options_list = [1, 1, 1, 1]
 
         self.int_number = 8
@@ -89,7 +88,7 @@ class AppManager:
 
         self.pathfile_entry = ttk.Entry(frame, width=74)
         self.pathfile_entry.place(relx=0.52, rely=0.5, anchor="center")
-        self.pathfile_entry.insert(END, string=self.key_path)
+        self.pathfile_entry.insert(END, string=self.key_path_cache)
 
         self.pathfile_copy_button = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.pathfile_entry.get()), width=7)
         self.pathfile_copy_button.place(relx=0.73, rely=0.5, anchor="center")
@@ -116,19 +115,21 @@ class AppManager:
 
         self.entry_website = ttk.Entry(frame, width=58)
         self.entry_website.place(relx=0.52, rely=0.4, anchor="center")
+        self.entry_website.insert(END, string=self.website_cache)
 
         self.label_user = ttk.Label(frame, text="Login: ", width=18)
         self.label_user.place(relx=0.5, rely=0.5, relwidth=0.5, relheight=0.1, anchor="center")
 
         self.entry_user = ttk.Entry(frame, width=58)
         self.entry_user.place(relx=0.52, rely=0.5, anchor="center")
+        self.entry_user.insert(END, string=self.user_cache)
 
         self.label_pw = ttk.Label(frame, text="Password: ", width=18)
         self.label_pw.place(relx=0.5, rely=0.6, relwidth=0.5, relheight=0.1, anchor="center")
 
         self.entry_pw = ttk.Entry(frame, width=58)
         self.entry_pw.place(relx=0.52, rely=0.6, anchor="center")
-        self.entry_pw.insert(END, string=self.pw)
+        self.entry_pw.insert(END, string=self.pw_cache)
 
         self.label_secure = ttk.Label(frame, text="Password secure? ", width=18)
         self.label_secure.place(relx=0.5, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
@@ -152,6 +153,7 @@ class AppManager:
         self.button_add.place(relx=0.637, rely=0.8, anchor="center")
 
         self.check_security_status()
+        self.save_entry_cache()
 
     def password_generator_screen(self, frame):
         self.welcome.pack_forget()
@@ -266,7 +268,7 @@ class AppManager:
             key_value = self.data.load_key_file()
             status = self.tools.insert_security_key(key_value)
             self.pathfile_entry.insert(END, string=self.data.key_path)
-            self.key_path = self.pathfile_entry.get()
+            self.key_path_cache = self.pathfile_entry.get()
             self.sidebar_show_buttons()
             if status:
                 return True
@@ -279,7 +281,7 @@ class AppManager:
             self.data.create_key_file(create_key)
             status = self.tools.insert_security_key(create_key)
             self.pathfile_entry.insert(END, string=self.data.key_path)
-            self.key_path = self.pathfile_entry.get()
+            self.key_path_cache = self.pathfile_entry.get()
             self.sidebar_show_buttons()
             if status:
                 return True
@@ -287,6 +289,12 @@ class AppManager:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
 # Password Manager Screen Functions
+
+    def save_entry_cache(self):
+        if self.password_manager.winfo_exists():
+            self.website_cache = self.entry_website.get()
+            self.user_cache = self.entry_user.get()
+            self.pw_cache = self.entry_pw.get()
 
     def no_file_found(self):
         try:
@@ -318,16 +326,6 @@ class AppManager:
             messagebox.showinfo(title="Success!", message=f"Website/URL: {website} \nLogin: {user} \nPassword: "
                                                           f"{password} saved successfully.")
             self.clear_all_entries()
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
-
-    def button_pushed_load_file(self):
-        try:
-            self.data.open_json_file()
-        except FileNotFoundError:
-            messagebox.showinfo(title="Error!", message="File not found.")
-        except json.JSONDecodeError:
-            messagebox.showinfo(title="Error!", message="Could not decode JSON.")
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
@@ -365,27 +363,6 @@ class AppManager:
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def delete_data_from_file(self):
-        check_delete_error = None
-        try:
-            if self.selected_item is None:
-                messagebox.showinfo(title="Error!", message="No Password to delete.")
-                check_delete_error = True
-            self.data.delete_item(self.selected_item)
-            self.data.save_new_data()
-            self.clear_all_entries()
-        except Exception as error:
-            if check_delete_error is not True:
-                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
-
-    def clear_all_entries(self):
-        try:
-            self.entry_website.delete(0, END)
-            self.entry_user.delete(0, END)
-            self.entry_pw.delete(0, END)
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
-
 # Password Generator Screen Functions
 
     def on_scale_change(self, value):
@@ -416,8 +393,44 @@ class AppManager:
             self.pw_length = self.on_scale_change(self.int_number)
             pw_options = self.pw_options_list
             pw = self.tools.generate_password(self.pw_length, pw_options)
-            self.pw = pw
+            self.pw_cache = pw
             if len(pw) != 0:
                 self.entry_pw.insert(tk.END, pw)
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+# Menubar
+
+    def button_pushed_load_file(self):
+        try:
+            self.data.open_json_file()
+        except FileNotFoundError:
+            messagebox.showinfo(title="Error!", message="File not found.")
+        except json.JSONDecodeError:
+            messagebox.showinfo(title="Error!", message="Could not decode JSON.")
+        except Exception as error:
+            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+    def delete_data_from_file(self):
+        check_delete_error = None
+        try:
+            if self.selected_item is None:
+                messagebox.showinfo(title="Error!", message="No Password to delete.")
+                check_delete_error = True
+            self.data.delete_item(self.selected_item)
+            self.data.save_new_data()
+            self.clear_all_entries()
+        except Exception as error:
+            if check_delete_error is not True:
+                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+
+    def clear_all_entries(self):
+        try:
+            self.entry_website.delete(0, END)
+            self.entry_user.delete(0, END)
+            self.entry_pw.delete(0, END)
+            self.website_cache = ""
+            self.user_cache = ""
+            self.pw_cache = ""
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
