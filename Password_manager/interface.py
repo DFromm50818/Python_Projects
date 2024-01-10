@@ -30,16 +30,18 @@ class AppManager:
 
         self.menubar_main(self.main_window)
         self.app_window_frames(self.main_window)
+        self.error_screen_frame(self.error_screen)
         self.sidebar_menu(self.sidebar)
         self.welcome_screen(self.welcome)
         self.apply_theme()
 
     def app_window_frames(self, frame):
-        self.sidebar = ttk.Frame(frame, width=200, height=200, borderwidth=5, relief=GROOVE)
-        self.welcome = ttk.Frame(frame, width=200, height=200, borderwidth=5, relief=GROOVE)
-        self.key_loading = ttk.Frame(frame, width=200, height=200, borderwidth=5, relief=GROOVE)
-        self.password_manager = ttk.Frame(frame, width=200, height=200, borderwidth=5, relief=GROOVE)
-        self.password_generator = ttk.Frame(frame, width=200, height=200, borderwidth=5, relief=GROOVE)
+        self.sidebar = ttk.Frame(frame, width=200, height=770, borderwidth=0, relief=GROOVE)
+        self.welcome = ttk.Frame(frame, width=1400, height=700, borderwidth=0, relief=GROOVE)
+        self.key_loading = ttk.Frame(frame, width=1400, height=700, borderwidth=0, relief=GROOVE)
+        self.password_manager = ttk.Frame(frame, width=1400, height=700, borderwidth=0, relief=GROOVE)
+        self.password_generator = ttk.Frame(frame, width=1400, height=700, borderwidth=0, relief=GROOVE)
+        self.error_screen = ttk.Frame(frame, width=1400, height=33, borderwidth=0, relief=GROOVE)
 
     def sidebar_menu(self, frame):
         self.sidebar.pack(side="left", fill="y")
@@ -54,30 +56,30 @@ class AppManager:
         self.key_loading.pack_forget()
         self.password_manager.pack_forget()
         self.password_generator.pack_forget()
-        self.welcome.pack(side="left", fill="both", expand=True)
+        self.welcome.pack(side="top", fill="both", expand=True)
 
         self.canvas = Canvas(frame, width=331, height=304, highlightthickness=0)
         self.picture_png = PhotoImage(file="logo.png")
         self.canvas.create_image(156, 150, image=self.picture_png)
-        self.canvas.place(relx=0.4, rely=0.4)
+        self.canvas.place(relx=0.38, rely=0.35)
 
         self.label_welcome = ttk.Label(frame, text="Welcome to NightWardenKey", font=("Arial", 30))
-        self.label_welcome.place(relx=0.32, rely=0.3)
+        self.label_welcome.place(relx=0.29, rely=0.25)
 
     def key_loading_screen(self, frame):
         self.welcome.pack_forget()
         self.password_manager.pack_forget()
         self.password_generator.pack_forget()
-        self.key_loading.pack(side="left", fill="both", expand=True)
+        self.key_loading.pack(side="top", fill="both", expand=True)
 
         self.label_title = ttk.Label(frame, text="Key Manager")
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
 
-        self.label_info = ttk.Label(frame, text="This is where you create or load your key to decrypt your saved "
-                                                "passwords.\nImportant: Do not lose the key file, otherwise you will "
-                                                "no longer be able to \naccess your passwords.")
-        self.label_info.place(relx=0.47, rely=0.15, relwidth=0.5, relheight=0.5, anchor="center")
+        self.label_info = ttk.Label(frame, text=" This is where you create or load your key to decrypt your saved\n "
+                                                "passwords. IMPORTANT: Do not lose the key file, otherwise you will "
+                                                "no\n longer be able to access your passwords.")
+        self.label_info.place(relx=0.47, rely=0.15, relwidth=0.5, anchor="center")
 
         self.label_no_key = ttk.Label(frame, text="No Keyfile: ")
         self.label_no_key.place(relx=0.47, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
@@ -107,11 +109,14 @@ class AppManager:
         self.welcome.pack_forget()
         self.key_loading.pack_forget()
         self.password_generator.pack_forget()
-        self.password_manager.pack(side="left", fill="both", expand=True)
+        self.password_manager.pack(side="top", fill="both", expand=True)
 
         self.label_title = ttk.Label(frame, text="Password Manager")
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
+
+        self.label_info = ttk.Label(frame, text="Here you can save your new passwords and load existing ones.")
+        self.label_info.place(relx=0.47, rely=0.15, relwidth=0.5, anchor="center")
 
         self.label_load_item = ttk.Label(frame, text="Saved Passwords: ")
         self.label_load_item.place(relx=0.47, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
@@ -160,7 +165,7 @@ class AppManager:
         self.button_copy_pw.place(relx=0.735, rely=0.6, anchor="center")
 
         self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.
-                                        password_generator_screen(self))
+                                        password_generator_screen(frame))
         self.button_gen_pw.place(relx=0.32, rely=0.8, anchor="center")
 
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(
@@ -173,11 +178,15 @@ class AppManager:
         self.welcome.pack_forget()
         self.key_loading.pack_forget()
         self.password_manager.pack_forget()
-        self.password_generator.pack(side="left", fill="both", expand=True)
+        self.password_generator.pack(side="top", fill="both", expand=True)
 
         self.label_title = ttk.Label(frame, text="Key Generator")
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
+
+        self.label_info = ttk.Label(frame, text="You can create your new password here. Once you have created your \n"
+                                                "new password, it is automatically sent to the password manager.")
+        self.label_info.place(relx=0.47, rely=0.15, relwidth=0.5, anchor="center")
 
         self.label_pw = ttk.Label(frame, text="New Password: ", width=18)
         self.label_pw.place(relx=0.48, rely=0.3, relwidth=0.5, relheight=0.1, anchor="center")
@@ -218,14 +227,19 @@ class AppManager:
         self.password_length_slider.place(relx=0.5, rely=0.6, relwidth=0.3, anchor="center")
 
         self.label_password_length = ttk.Label(frame, text="Password length: ", width=18)
-        self.label_password_length.place(relx=0.5, rely=0.62, anchor="center")
+        self.label_password_length.place(relx=0.5, rely=0.64, anchor="center")
 
         self.label_password_length_screen = ttk.Label(frame, text="8", width=18)
-        self.label_password_length_screen.place(relx=0.63, rely=0.62, anchor="center")
+        self.label_password_length_screen.place(relx=0.63, rely=0.64, anchor="center")
 
         self.button_gen_pw = ttk.Button(frame, width=30, text="Generate Password", command=lambda: self.
                                         insert_generated_password_entry_pw())
-        self.button_gen_pw.place(relx=0.5, rely=0.8, anchor="center")
+        self.button_gen_pw.place(relx=0.5, rely=0.75, anchor="center")
+
+    def error_screen_frame(self, frame):
+        self.error_screen.pack(side="bottom", fill="y")
+        self.label_show_error = ttk.Label(frame, width=100)
+        self.label_show_error.place(relx=0.21)
 
     def menubar_main(self, root):
         self.data_menu = Menu(root)
@@ -241,11 +255,10 @@ class AppManager:
         self.data_menu.add_cascade(label="Data", menu=self.item)
         self.main_window.config(menu=self.data_menu)
 
-    def show_error_area(self, error):
-        self.label_show_error = ttk.Label(self.main_window, textvariable=error, width=100)
-        self.label_show_error.place(relx=0.6, rely=0.2, anchor="center")
-
     # Main Screen Functions
+
+    def show_error_area(self, error):
+        self.label_show_error.config(text=f"{error}")
 
     def apply_theme(self):
         try:
@@ -305,9 +318,12 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        except Exception as error:
+        except PermissionError:
+            error = "Error! Please check if you have the rights for the file."
             self.show_error_area(error)
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except ValueError:
+            error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
+            self.show_error_area(error)
 
     def button_pushed_create_key_file(self):
         try:
@@ -319,8 +335,9 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except Exception:
+            error = "Error! An error has occurred. Please try again to create a file."
+            self.show_error_area(error)
 
     # Password Manager Screen Functions
 
@@ -349,15 +366,18 @@ class AppManager:
                 self.data.create_file()
             else:
                 self.button_pushed_load_file()
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except Exception:
+            error = "Error! An error has occurred. Please try again."
+            self.show_error_area(error)
+
 
     def combobox_load_options(self):
         try:
             websites = self.data.load_website_options()
             self.combobox["values"] = websites
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except Exception:
+            error = "Error! An error has occurred. Loaded file is compromised."
+            self.show_error_area(error)
 
     def button_pushed_save_data(self, website, user, password):
         try:
@@ -372,8 +392,15 @@ class AppManager:
             messagebox.showinfo(title="Success!", message=f"Website/URL: {website} \nLogin: {user} \nPassword: "
                                                           f"{password} saved successfully.")
             self.clear_all_entries()
+        except PermissionError:
+            error = "Error! Please check if you have the rights for the file."
+            self.show_error_area(error)
+        except ValueError:
+            error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
+            self.show_error_area(error)
         except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+            error = "Error! Data could not be saved. Please check your entries."
+            self.show_error_area(error)
 
     def on_combobox_select(self, event):
         try:
@@ -388,26 +415,22 @@ class AppManager:
                         encrypted_user = self.tools.decrypt_data(user_show)
                         encrypted_pw = self.tools.decrypt_data(pw_show)
                         self.insert_text_to_entries(website_show, encrypted_user, encrypted_pw)
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        except Exception:
+            error = "Error! Stored password is incorrect."
+            self.show_error_area(error)
 
     def insert_text_to_entries(self, website, decrypted_user, decrypted_password):
-        try:
-            if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
-                self.clear_all_entries()
-            self.entry_website.insert(END, string=website)
-            self.entry_user.insert(END, string=decrypted_user)
-            self.entry_pw.insert(END, string=decrypted_password)
-            self.show_selected_checkmark_capital()
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
+            self.clear_all_entries()
+        self.entry_website.insert(END, string=website)
+        self.entry_user.insert(END, string=decrypted_user)
+        self.entry_pw.insert(END, string=decrypted_password)
+        self.show_selected_checkmark_capital()
+
 
     def security_light_update(self, light_status):
-        try:
-            if light_status in ("strong", "medium", "weak"):
-                self.label_security_step.config(text=light_status)
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        if light_status in ("strong", "medium", "weak"):
+            self.label_security_step.config(text=light_status)
 
     # Password Generator Screen Functions
 
@@ -434,16 +457,13 @@ class AppManager:
         self.pw_options_list[3] = selection
 
     def insert_generated_password_entry_pw(self):
-        try:
-            self.entry_generate_pw.delete(0, END)
-            self.pw_length = self.on_scale_change(self.int_number)
-            pw_options = self.pw_options_list
-            pw = self.tools.generate_password(self.pw_length, pw_options)
-            self.pw_cache = pw
-            if len(pw) != 0:
-                self.entry_generate_pw.insert(tk.END, pw)
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        self.entry_generate_pw.delete(0, END)
+        self.pw_length = self.on_scale_change(self.int_number)
+        pw_options = self.pw_options_list
+        pw = self.tools.generate_password(self.pw_length, pw_options)
+        self.pw_cache = pw
+        if len(pw) != 0:
+            self.entry_generate_pw.insert(tk.END, pw)
 
     # Menubar
 
@@ -451,11 +471,14 @@ class AppManager:
         try:
             self.data.open_json_file()
         except FileNotFoundError:
-            messagebox.showinfo(title="Error!", message="File not found.")
+            error = "Error! File not found."
+            self.show_error_area(error)
         except json.JSONDecodeError:
-            messagebox.showinfo(title="Error!", message="Could not decode JSON.")
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+            error = "Error! Could not decode JSON. File is compromised."
+            self.show_error_area(error)
+        except Exception:
+            error = "Error! Data could not be loaded."
+            self.show_error_area(error)
 
     def delete_data_from_file(self):
         check_delete_error = None

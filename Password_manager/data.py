@@ -120,5 +120,5 @@ class PasswordTools:
         try:
             self.cipher_suite = Fernet(key)
             return True
-        except:
-            return None
+        except Exception as error:
+            return error
