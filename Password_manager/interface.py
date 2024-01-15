@@ -152,9 +152,8 @@ class AppManager:
         self.label_security_step = ttk.Label(frame)
         self.label_security_step.place(relx=0.65, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.button_copy_website = ttk.Button(frame, text="Load File", command=lambda: pyperclip.copy(self.entry_website.
-                                                                                                 get()), width=10)
-        self.button_copy_website.place(relx=0.735, rely=0.3, anchor="center")
+        self.button_load_file = ttk.Button(frame, text="Load File", command=self.button_pushed_load_file, width=10)
+        self.button_load_file.place(relx=0.735, rely=0.3, anchor="center")
 
         self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.
                                                                                                  get()), width=10)
@@ -264,8 +263,20 @@ class AppManager:
     def switch_to_pw_generator(self):
         self.password_generator_screen(self.main_window)
 
-    def show_error_area(self, error):
+
+
+    # Error Screen Functions
+
+    def manage_error_label(self, error):
+        self.show_error_area_label(error)
+        self.main_window.after(5000, self.delete_error_label_after_time())
+        # self.delete_error_label_after_time
+
+    def show_error_area_label(self, error):
         self.label_show_error.config(text=f"{error}")
+
+    def delete_error_label_after_time(self):
+        self.label_show_error.config(text="")
 
     def apply_theme(self):
         try:
@@ -394,7 +405,7 @@ class AppManager:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
             error = f"Success! Website/URL: {website} Login: {user} Password: {password} saved successfully."
-            self.show_error_area(error)
+            self.manage_error_label(error)
             self.clear_all_entries()
         # # except PermissionError:
         # #     error = "Error! Please check if you have the rights for the file."
@@ -489,7 +500,7 @@ class AppManager:
         try:
             if self.selected_item is None:
                 error = "Error! No password available to delete."
-                self.show_error_area(error)
+                self.show_error_area_label(error)
                 check_delete_error = True
             self.data.delete_item(self.selected_item)
             self.data.save_new_data()
@@ -497,7 +508,7 @@ class AppManager:
         except Exception as error:
             if check_delete_error is not True:
                 error = f"Error! Password cannot be deleted. {error}."
-                self.show_error_area(error)
+                self.show_error_area_label(error)
 
     def clear_all_entries(self):
         self.entry_website.delete(0, END)
