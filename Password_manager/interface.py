@@ -152,6 +152,9 @@ class AppManager:
         self.label_security_step = ttk.Label(frame)
         self.label_security_step.place(relx=0.65, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
 
+        self.button_load_file = ttk.Button(frame, text="Load", command=self.button_pushed_load_file, width=6)
+        self.button_load_file.place(relx=0.735, rely=0.3, anchor="center")
+
         self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.
                                                                                                  get()), width=6)
         self.button_copy_website.place(relx=0.735, rely=0.4, anchor="center")
@@ -165,7 +168,7 @@ class AppManager:
         self.button_copy_pw.place(relx=0.735, rely=0.6, anchor="center")
 
         self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.
-                                        password_generator_screen(frame))
+                                        password_generator_screen(self.main_window))
         self.button_gen_pw.place(relx=0.32, rely=0.8, anchor="center")
 
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(
@@ -257,6 +260,9 @@ class AppManager:
 
     # Main Screen Functions
 
+    def switch_to_pw_generator(self):
+        self.password_generator_screen(self.main_window)
+
     def show_error_area(self, error):
         self.label_show_error.config(text=f"{error}")
 
@@ -264,24 +270,21 @@ class AppManager:
         try:
             styles = Style()
             styles.theme_use(THEME)
-            # frame_style = style.lookup('TFrame', 'background')
-            # label_style = style.lookup('TLabel', 'background')
-            styles.configure('label_title.TLabel', font=('Arial', 30))
-            styles.configure('TButton', font=('Arial', 15))
-            styles.configure('TLabel', font=('Arial', 15))
-            styles.configure('TEntry', font=('Arial', 15), padding=[9])
-            styles.configure('TCombobox', font=('Arial', 15), padding=[9])
-            # self.main_window.config(bg=frame_style)
-            # self.canvas.config(bg=label_style)
+            styles.configure("My.TFrame", bg="grey")
+            styles.configure("label_title.TLabel", font=('Arial', 30))
+            styles.configure("TButton", font=('Arial', 15))
+            styles.configure("TLabel", font=('Arial', 15))
+            styles.configure("TEntry", font=('Arial', 15), padding=[9])
+            styles.configure("TCombobox", font=('Arial', 15), padding=[9])
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def check_security_status(self):
-        try:
+        # try:
             self.main_window.after(500, self.check_security_status)
             self.security_light_update(self.tools.password_check(self.entry_pw.get()))
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        # except Exception as error:
+        #     messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def exit_program(self):
         response = messagebox.askokcancel(title="Quit program? ", message=f"All unsaved Data are lost.")
@@ -310,7 +313,7 @@ class AppManager:
     # Key Manager Loading Screen Functions
 
     def button_pushed_load_key(self):
-        try:
+        # try:
             key_value = self.data.load_key_file()
             status = self.tools.insert_security_key(key_value)
             self.pathfile_entry.insert(END, string=self.data.key_path)
@@ -318,15 +321,15 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        except PermissionError:
-            error = "Error! Please check if you have the rights for the file."
-            self.show_error_area(error)
-        except ValueError:
-            error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
-            self.show_error_area(error)
+        # except PermissionError:
+        #     error = "Error! Please check if you have the rights for the file."
+        #     self.show_error_area(error)
+        # except ValueError:
+        #     error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
+        #     self.show_error_area(error)
 
     def button_pushed_create_key_file(self):
-        try:
+        # try:
             create_key = self.tools.generate_security_key()
             self.data.create_key_file(create_key)
             status = self.tools.insert_security_key(create_key)
@@ -335,9 +338,9 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        except Exception:
-            error = "Error! An error has occurred. Please try again to create a file."
-            self.show_error_area(error)
+        # except Exception:
+        #     error = "Error! An error has occurred. Please try again to create a file."
+        #     self.show_error_area(error)
 
     # Password Manager Screen Functions
 
@@ -358,7 +361,7 @@ class AppManager:
             self.pw_cache = self.entry_pw.get()
 
     def no_file_found(self):
-        try:
+        # try:
             file_not_found = messagebox.askokcancel(title="No file found!", message="Do you want to create a file "
                                                                                     "press Ok or load a file "
                                                                                     "press Cancel")
@@ -366,44 +369,44 @@ class AppManager:
                 self.data.create_file()
             else:
                 self.button_pushed_load_file()
-        except Exception:
-            error = "Error! An error has occurred. Please try again."
-            self.show_error_area(error)
+        # except Exception:
+        #     error = "Error! An error has occurred. Please try again."
+        #     self.show_error_area(error)
 
 
     def combobox_load_options(self):
-        try:
+        # try:
             websites = self.data.load_website_options()
             self.combobox["values"] = websites
-        except Exception:
-            error = "Error! An error has occurred. Loaded file is compromised."
-            self.show_error_area(error)
+        # except Exception:
+        #     error = "Error! An error has occurred. Loaded file is compromised."
+        #     self.show_error_area(error)
 
     def button_pushed_save_data(self, website, user, password):
-        try:
+        # try:
             user_encrypt = self.tools.encrypt_data(user)
             password_encrypt = self.tools.encrypt_data(password)
             if not all([website, user, password, password]):
                 return messagebox.showerror(title="Error!", message="The data could not be saved. "
                                                                     "Please fill out all entries.")
-            if self.data.json_data_path is False:
+            if self.data.json_data_path is not True:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
             messagebox.showinfo(title="Success!", message=f"Website/URL: {website} \nLogin: {user} \nPassword: "
-                                                          f"{password} saved successfully.")
+                                                          f"{password} \nsaved successfully.")
             self.clear_all_entries()
-        except PermissionError:
-            error = "Error! Please check if you have the rights for the file."
-            self.show_error_area(error)
-        except ValueError:
-            error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
-            self.show_error_area(error)
-        except Exception as error:
-            error = "Error! Data could not be saved. Please check your entries."
-            self.show_error_area(error)
+        # # except PermissionError:
+        # #     error = "Error! Please check if you have the rights for the file."
+        # #     self.show_error_area(error)
+        # except ValueError:
+        #     error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
+        #     self.show_error_area(error)
+        # except Exception as error:
+        #     error = "Error! Data could not be saved. Please check your entries."
+        #     self.show_error_area(error)
 
     def on_combobox_select(self, event):
-        try:
+        # try:
             selected_value = event.widget.get()
             for item in self.data.read_file:
                 for key, value in item.items():
@@ -415,9 +418,9 @@ class AppManager:
                         encrypted_user = self.tools.decrypt_data(user_show)
                         encrypted_pw = self.tools.decrypt_data(pw_show)
                         self.insert_text_to_entries(website_show, encrypted_user, encrypted_pw)
-        except Exception:
-            error = "Error! Stored password is incorrect."
-            self.show_error_area(error)
+        # except Exception:
+        #     error = "Error! Stored password is incorrect or cannot be loaded."
+        #     self.show_error_area(error)
 
     def insert_text_to_entries(self, website, decrypted_user, decrypted_password):
         if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
@@ -468,38 +471,38 @@ class AppManager:
     # Menubar
 
     def button_pushed_load_file(self):
-        try:
+        # try:
             self.data.open_json_file()
-        except FileNotFoundError:
-            error = "Error! File not found."
-            self.show_error_area(error)
-        except json.JSONDecodeError:
-            error = "Error! Could not decode JSON. File is compromised."
-            self.show_error_area(error)
-        except Exception:
-            error = "Error! Data could not be loaded."
-            self.show_error_area(error)
+        # except FileNotFoundError:
+        #     error = "Error! File not found."
+        #     self.show_error_area(error)
+        # except json.JSONDecodeError:
+        #     error = "Error! Could not decode JSON. File is invalid or compromised."
+        #     self.show_error_area(error)
+        # except Exception:
+        #     error = "Error! Data could not be loaded."
+        #     self.show_error_area(error)
 
     def delete_data_from_file(self):
         check_delete_error = None
         try:
             if self.selected_item is None:
-                messagebox.showinfo(title="Error!", message="No Password to delete.")
+                error = "Error! No password available to delete."
+                self.show_error_area(error)
                 check_delete_error = True
             self.data.delete_item(self.selected_item)
             self.data.save_new_data()
             self.clear_all_entries()
         except Exception as error:
             if check_delete_error is not True:
-                messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+                error = f"Error! Password cannot be deleted. {error}."
+                self.show_error_area(error)
 
     def clear_all_entries(self):
-        try:
-            self.entry_website.delete(0, END)
-            self.entry_user.delete(0, END)
-            self.entry_pw.delete(0, END)
-            self.website_cache = ""
-            self.user_cache = ""
-            self.pw_cache = ""
-        except Exception as error:
-            messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
+        self.entry_website.delete(0, END)
+        self.entry_user.delete(0, END)
+        self.entry_pw.delete(0, END)
+        self.website_cache = ""
+        self.user_cache = ""
+        self.pw_cache = ""
+

@@ -9,8 +9,8 @@ import string
 class Data:
     def __init__(self):
         self.website_option = []
-        self.file_path = ""
-        self.json_data_path = False
+        # self.file_path = ""
+        self.json_data_path = ""
         self.key_path = ""
         self.read_file = []
         self.website_option_encrypted = []
@@ -21,6 +21,7 @@ class Data:
             with open(self.file_path, "r") as file:
                 self.json_data_path = os.path.abspath(self.file_path)
                 self.read_file = json.load(file)
+            return self.json_data_path
 
     def save_new_data(self, encrypt_website=None, encrypt_user=None, encrypt_password=None):
         if all((encrypt_website, encrypt_user, encrypt_password)):
@@ -39,11 +40,11 @@ class Data:
         return self.read_file
 
     def create_file(self):
-        filepath = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
-        self.json_data_path = os.path.abspath(filepath)
-        with open(self.json_data_path, "w") as _:
-            pass
-        return self.json_data_path
+        file_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+        self.json_data_path = os.path.abspath(file_path)
+        if file_path:
+            with open(self.json_data_path, "w") as _:
+                pass
 
     def create_key_file(self, key):
         self.key_path = filedialog.asksaveasfilename(defaultextension=".bin", filetypes=[("BIN files", "*.bin")])
