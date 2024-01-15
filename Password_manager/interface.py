@@ -152,19 +152,20 @@ class AppManager:
         self.label_security_step = ttk.Label(frame)
         self.label_security_step.place(relx=0.65, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.button_load_file = ttk.Button(frame, text="Load", command=self.button_pushed_load_file, width=6)
-        self.button_load_file.place(relx=0.735, rely=0.3, anchor="center")
+        self.button_copy_website = ttk.Button(frame, text="Load File", command=lambda: pyperclip.copy(self.entry_website.
+                                                                                                 get()), width=10)
+        self.button_copy_website.place(relx=0.735, rely=0.3, anchor="center")
 
         self.button_copy_website = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_website.
-                                                                                                 get()), width=6)
+                                                                                                 get()), width=10)
         self.button_copy_website.place(relx=0.735, rely=0.4, anchor="center")
 
         self.button_copy_user = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_user.get()),
-                                           width=6)
+                                           width=10)
         self.button_copy_user.place(relx=0.735, rely=0.5, anchor="center")
 
         self.button_copy_pw = ttk.Button(frame, text="Copy", command=lambda: pyperclip.copy(self.entry_pw.get()),
-                                         width=6)
+                                         width=10)
         self.button_copy_pw.place(relx=0.735, rely=0.6, anchor="center")
 
         self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.
@@ -389,11 +390,11 @@ class AppManager:
             if not all([website, user, password, password]):
                 return messagebox.showerror(title="Error!", message="The data could not be saved. "
                                                                     "Please fill out all entries.")
-            if self.data.json_data_path is not True:
+            if self.data.json_data_path is False:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
-            messagebox.showinfo(title="Success!", message=f"Website/URL: {website} \nLogin: {user} \nPassword: "
-                                                          f"{password} \nsaved successfully.")
+            error = f"Success! Website/URL: {website} Login: {user} Password: {password} saved successfully."
+            self.show_error_area(error)
             self.clear_all_entries()
         # # except PermissionError:
         # #     error = "Error! Please check if you have the rights for the file."

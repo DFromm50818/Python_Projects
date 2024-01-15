@@ -9,8 +9,8 @@ import string
 class Data:
     def __init__(self):
         self.website_option = []
-        # self.file_path = ""
-        self.json_data_path = ""
+        self.file_path = None
+        self.json_data_path = False
         self.key_path = ""
         self.read_file = []
         self.website_option_encrypted = []
