@@ -20,6 +20,8 @@ class AppManager:
         self.var_lowercase = IntVar(value=1)
         self.var_numbers = IntVar(value=1)
         self.var_special = IntVar(value=1)
+        self.entry_pw_var = StringVar()
+        self.password_length_scale_var = tk.DoubleVar()
         self.tools = data.PasswordTools()
         self.data = data.Data()
         self.selected_item = None
@@ -142,9 +144,11 @@ class AppManager:
         self.label_pw = ttk.Label(frame, text="Password: ", width=18)
         self.label_pw.place(relx=0.47, rely=0.6, relwidth=0.5, relheight=0.1, anchor="center")
 
-        self.entry_pw = ttk.Entry(frame, width=58)
+        self.entry_pw = ttk.Entry(frame, width=58, textvariable=self.entry_pw_var)
         self.entry_pw.place(relx=0.52, rely=0.6, anchor="center")
+        self.entry_pw.delete(0, END)
         self.entry_pw.insert(END, string=self.pw_cache)
+        self.entry_pw_var.trace_add("write", self.check_security_status)
 
         self.label_secure = ttk.Label(frame, text="Password secure? ", width=18)
         self.label_secure.place(relx=0.47, rely=0.7, relwidth=0.5, relheight=0.1, anchor="center")
@@ -174,8 +178,6 @@ class AppManager:
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(
             self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
         self.button_add.place(relx=0.637, rely=0.8, anchor="center")
-
-        self.check_security_status()
 
     def password_generator_screen(self, frame):
         self.welcome.pack_forget()
@@ -226,7 +228,7 @@ class AppManager:
         self.label_special = ttk.Label(frame, text="Special characters", width=18)
         self.label_special.place(relx=0.62, rely=0.5, anchor="center")
 
-        self.password_length_slider = ttk.Scale(frame, from_=8, to=40, command=self.on_scale_change)
+        self.password_length_slider = ttk.Scale(frame, variable=self.password_length_scale_var, from_=8, to=40, command=self.on_scale_change)
         self.password_length_slider.place(relx=0.5, rely=0.6, relwidth=0.3, anchor="center")
 
         self.label_password_length = ttk.Label(frame, text="Password length: ", width=18)
@@ -235,8 +237,8 @@ class AppManager:
         self.label_password_length_screen = ttk.Label(frame, text="8", width=18)
         self.label_password_length_screen.place(relx=0.63, rely=0.64, anchor="center")
 
-        self.button_gen_pw = ttk.Button(frame, width=30, text="Generate Password", command=lambda: self.
-                                        insert_generated_password_entry_pw())
+        self.button_gen_pw = ttk.Button(frame, width=30, text="Generate Password", command=self.
+                                        insert_generated_password_entry_pw)
         self.button_gen_pw.place(relx=0.5, rely=0.75, anchor="center")
 
     def error_screen_frame(self, frame):
@@ -263,21 +265,6 @@ class AppManager:
     def switch_to_pw_generator(self):
         self.password_generator_screen(self.main_window)
 
-
-
-    # Error Screen Functions
-
-    def manage_error_label(self, error):
-        self.show_error_area_label(error)
-        self.main_window.after(5000, self.delete_error_label_after_time())
-        # self.delete_error_label_after_time
-
-    def show_error_area_label(self, error):
-        self.label_show_error.config(text=f"{error}")
-
-    def delete_error_label_after_time(self):
-        self.label_show_error.config(text="")
-
     def apply_theme(self):
         try:
             styles = Style()
@@ -291,10 +278,13 @@ class AppManager:
         except Exception as error:
             messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
-    def check_security_status(self):
-        # try:
-            self.main_window.after(500, self.check_security_status)
-            self.security_light_update(self.tools.password_check(self.entry_pw.get()))
+    def check_security_status(self, password, *args):
+        try:
+            password = self.entry_pw.get()
+        except:
+            pass
+        self.security_light_update(self.tools.password_check(password))
+        self.label_show_error.config(text="")
         # except Exception as error:
         #     messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
@@ -399,8 +389,8 @@ class AppManager:
             user_encrypt = self.tools.encrypt_data(user)
             password_encrypt = self.tools.encrypt_data(password)
             if not all([website, user, password, password]):
-                return messagebox.showerror(title="Error!", message="The data could not be saved. "
-                                                                    "Please fill out all entries.")
+                error = f"Error! The data could not be saved. Please fill out all entries."
+                return self.manage_error_label(error)
             if self.data.json_data_path is False:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
@@ -475,10 +465,22 @@ class AppManager:
         self.entry_generate_pw.delete(0, END)
         self.pw_length = self.on_scale_change(self.int_number)
         pw_options = self.pw_options_list
-        pw = self.tools.generate_password(self.pw_length, pw_options)
-        self.pw_cache = pw
-        if len(pw) != 0:
-            self.entry_generate_pw.insert(tk.END, pw)
+        self.pw_cache = self.tools.generate_password(self.pw_length, pw_options)
+        if len(self.pw_cache) != 0:
+            # self.entry_pw.delete(0, END)
+            self.entry_generate_pw.insert(tk.END, self.pw_cache)
+
+    # Error Screen Functions
+
+    def manage_error_label(self, error):
+        self.show_error_area_label(error)
+        # self.delete_error_label_after_time
+
+    def show_error_area_label(self, error):
+        self.label_show_error.config(text=f"{error}")
+
+    def delete_error_label_after_time(self):
+        self.label_show_error.config(text="")
 
     # Menubar
 
@@ -517,4 +519,3 @@ class AppManager:
         self.website_cache = ""
         self.user_cache = ""
         self.pw_cache = ""
-
