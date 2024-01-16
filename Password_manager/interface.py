@@ -78,9 +78,9 @@ class AppManager:
         self.label_title.place(relx=0.27, rely=0.05, relwidth=0.5, relheight=0.1, anchor="center")
         self.label_title["style"] = "label_title.TLabel"
 
-        self.label_info = ttk.Label(frame, text=" This is where you create or load your key to decrypt your saved\n "
-                                                "passwords. IMPORTANT: Do not lose the key file, otherwise you will "
-                                                "no\n longer be able to access your passwords.")
+        self.label_info = ttk.Label(frame, text="This is where you create or load your key to decrypt your saved\n"
+                                                "passwords. IMPORTANT: Do not lose the key file, otherwise you will\n"
+                                                "no longer be able to access your passwords.")
         self.label_info.place(relx=0.47, rely=0.15, relwidth=0.5, anchor="center")
 
         self.label_no_key = ttk.Label(frame, text="No Keyfile: ")
@@ -171,8 +171,7 @@ class AppManager:
                                          width=10)
         self.button_copy_pw.place(relx=0.735, rely=0.6, anchor="center")
 
-        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.
-                                        password_generator_screen(self.main_window))
+        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.password_generator_screen(self.password_generator))
         self.button_gen_pw.place(relx=0.32, rely=0.8, anchor="center")
 
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(
@@ -394,8 +393,8 @@ class AppManager:
             if self.data.json_data_path is False:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
-            error = f"Success! Website/URL: {website} Login: {user} Password: {password} saved successfully."
-            self.manage_error_label(error)
+            save_success = f"Success! Website/URL: {website} Login: {user} Password: {password} saved successfully."
+            self.manage_error_label(save_success)
             self.clear_all_entries()
         # # except PermissionError:
         # #     error = "Error! Please check if you have the rights for the file."
@@ -427,6 +426,9 @@ class AppManager:
     def insert_text_to_entries(self, website, decrypted_user, decrypted_password):
         if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
             self.clear_all_entries()
+        self.entry_website.delete(0, END)
+        self.entry_user.delete(0, END)
+        self.entry_pw.delete(0, END)
         self.entry_website.insert(END, string=website)
         self.entry_user.insert(END, string=decrypted_user)
         self.entry_pw.insert(END, string=decrypted_password)
@@ -467,7 +469,6 @@ class AppManager:
         pw_options = self.pw_options_list
         self.pw_cache = self.tools.generate_password(self.pw_length, pw_options)
         if len(self.pw_cache) != 0:
-            # self.entry_pw.delete(0, END)
             self.entry_generate_pw.insert(tk.END, self.pw_cache)
 
     # Error Screen Functions
