@@ -280,8 +280,6 @@ class AppManager:
             pass
         self.security_light_update(self.tools.password_check(password))
         self.label_show_error.config(text="")
-        # except Exception as error:
-        #     messagebox.showinfo(title="Error!", message=f"An error occurred: {error}")
 
     def exit_program(self):
         response = messagebox.askokcancel(title="Quit program? ", message=f"All unsaved Data are lost.")
@@ -340,6 +338,16 @@ class AppManager:
         #     self.show_error_area(error)
 
     # Password Manager Screen Functions
+
+    def button_pushed_load_file(self):
+        try:
+            self.data.open_json_file()
+        except json.JSONDecodeError:
+            error = "Error! Could not decode JSON. File is invalid or compromised."
+            self.show_error_area_label(error)
+        except Exception:
+            error = "Error! Data could not be loaded."
+            self.show_error_area_label(error)
 
     def check_pw_cache(self):
         if len(self.pw_cache) > 0:
@@ -476,19 +484,6 @@ class AppManager:
         self.label_show_error.config(text="")
 
     # Menubar
-
-    def button_pushed_load_file(self):
-        # try:
-            self.data.open_json_file()
-        # except FileNotFoundError:
-        #     error = "Error! File not found."
-        #     self.show_error_area(error)
-        # except json.JSONDecodeError:
-        #     error = "Error! Could not decode JSON. File is invalid or compromised."
-        #     self.show_error_area(error)
-        # except Exception:
-        #     error = "Error! Data could not be loaded."
-        #     self.show_error_area(error)
 
     def delete_data_from_file(self):
         check_delete_error = None
