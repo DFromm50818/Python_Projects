@@ -171,12 +171,11 @@ class AppManager:
                                          width=10)
         self.button_copy_pw.place(relx=0.735, rely=0.6, anchor="center")
 
-        self.button_gen_pw = ttk.Button(frame, width=22, text="Generate Password", command=lambda: self.password_generator_screen(self.password_generator))
-        self.button_gen_pw.place(relx=0.32, rely=0.8, anchor="center")
-
         self.button_add = ttk.Button(frame, text="Save Password", command=lambda: self.button_pushed_save_data(
-            self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=22)
-        self.button_add.place(relx=0.637, rely=0.8, anchor="center")
+        self.entry_website.get(), self.entry_user.get(), self.entry_pw.get()), width=30)
+        self.button_add.place(relx=0.52, rely=0.8, anchor="center")
+
+        self.check_pw_cache()
 
     def password_generator_screen(self, frame):
         self.welcome.pack_forget()
@@ -261,9 +260,6 @@ class AppManager:
 
     # Main Screen Functions
 
-    def switch_to_pw_generator(self):
-        self.password_generator_screen(self.main_window)
-
     def apply_theme(self):
         try:
             styles = Style()
@@ -345,8 +341,9 @@ class AppManager:
 
     # Password Manager Screen Functions
 
-    def change_to_generate_password_and_back(self):
-        self.password_generator.pack(side="left", fill="both", expand=True)
+    def check_pw_cache(self):
+        if len(self.pw_cache) > 0:
+            self.check_security_status(self.pw_cache)
 
     def check_entry_focus(self):
         entry_filed_focus = self.password_manager.focus_get()
@@ -376,12 +373,12 @@ class AppManager:
 
 
     def combobox_load_options(self):
-        # try:
+        try:
             websites = self.data.load_website_options()
             self.combobox["values"] = websites
-        # except Exception:
-        #     error = "Error! An error has occurred. Loaded file is compromised."
-        #     self.show_error_area(error)
+        except Exception:
+            error = "Error! An error has occurred. Loaded file is corrupt."
+            self.show_error_area_label(error)
 
     def button_pushed_save_data(self, website, user, password):
         # try:
@@ -389,13 +386,13 @@ class AppManager:
             password_encrypt = self.tools.encrypt_data(password)
             if not all([website, user, password, password]):
                 error = f"Error! The data could not be saved. Please fill out all entries."
-                return self.manage_error_label(error)
+                return self.show_error_area_label(error)
             if self.data.json_data_path is False:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
-            save_success = f"Success! Website/URL: {website} Login: {user} Password: {password} saved successfully."
-            self.manage_error_label(save_success)
+            save_success = f"Success! Website/URL: {website}, Login: {user}, Password: {password}, saved successfully."
             self.clear_all_entries()
+            return self.show_error_area_label(save_success)
         # # except PermissionError:
         # #     error = "Error! Please check if you have the rights for the file."
         # #     self.show_error_area(error)
@@ -407,7 +404,7 @@ class AppManager:
         #     self.show_error_area(error)
 
     def on_combobox_select(self, event):
-        # try:
+        try:
             selected_value = event.widget.get()
             for item in self.data.read_file:
                 for key, value in item.items():
@@ -419,9 +416,9 @@ class AppManager:
                         encrypted_user = self.tools.decrypt_data(user_show)
                         encrypted_pw = self.tools.decrypt_data(pw_show)
                         self.insert_text_to_entries(website_show, encrypted_user, encrypted_pw)
-        # except Exception:
-        #     error = "Error! Stored password is incorrect or cannot be loaded."
-        #     self.show_error_area(error)
+        except Exception:
+            error = "Error! Stored password cannot be loaded with your key or is corrupt."
+            self.show_error_area_label(error)
 
     def insert_text_to_entries(self, website, decrypted_user, decrypted_password):
         if len(self.entry_website.get()) or len(self.entry_user.get()) or len(self.entry_user.get()) != 0:
@@ -433,7 +430,6 @@ class AppManager:
         self.entry_user.insert(END, string=decrypted_user)
         self.entry_pw.insert(END, string=decrypted_password)
         self.show_selected_checkmark_capital()
-
 
     def security_light_update(self, light_status):
         if light_status in ("strong", "medium", "weak"):
@@ -472,10 +468,6 @@ class AppManager:
             self.entry_generate_pw.insert(tk.END, self.pw_cache)
 
     # Error Screen Functions
-
-    def manage_error_label(self, error):
-        self.show_error_area_label(error)
-        # self.delete_error_label_after_time
 
     def show_error_area_label(self, error):
         self.label_show_error.config(text=f"{error}")
