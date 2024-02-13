@@ -308,7 +308,7 @@ class AppManager:
     # Key Manager Loading Screen Functions
 
     def button_pushed_load_key(self):
-        # try:
+        try:
             key_value = self.data.load_key_file()
             status = self.tools.insert_security_key(key_value)
             self.pathfile_entry.insert(END, string=self.data.key_path)
@@ -316,12 +316,12 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        # except PermissionError:
-        #     error = "Error! Please check if you have the rights for the file."
-        #     self.show_error_area(error)
-        # except ValueError:
-        #     error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
-        #     self.show_error_area(error)
+        except PermissionError:
+            error = "Error! Please check if you have the rights for the file."
+            self.show_error_area_label(error)
+        except ValueError:
+            error = "Error! Key could not be loaded or is invalid. Please load the right the Keyfile."
+            self.show_error_area_label(error)
 
     def button_pushed_create_key_file(self):
         # try:
