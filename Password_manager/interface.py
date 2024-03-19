@@ -335,7 +335,7 @@ class AppManager:
                 return True
         # except Exception:
         #     error = "Error! An error has occurred. Please try again to create a file."
-        #     self.show_error_area(error)
+        #     self.show_error_area_label(error)
 
     # Password Manager Screen Functions
 
