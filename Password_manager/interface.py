@@ -324,7 +324,7 @@ class AppManager:
             self.show_error_area_label(error)
 
     def button_pushed_create_key_file(self):
-        # try:
+        try:
             create_key = self.tools.generate_security_key()
             self.data.create_key_file(create_key)
             status = self.tools.insert_security_key(create_key)
@@ -333,9 +333,9 @@ class AppManager:
             self.sidebar_show_buttons()
             if status:
                 return True
-        # except Exception:
-        #     error = "Error! An error has occurred. Please try again to create a file."
-        #     self.show_error_area_label(error)
+        except FileNotFoundError:
+            error = ""
+            self.show_error_area_label(error)
 
     # Password Manager Screen Functions
 
@@ -398,7 +398,7 @@ class AppManager:
             if self.data.json_data_path is False:
                 self.no_file_found()
             self.data.save_new_data(website, user_encrypt, password_encrypt)
-            save_success = f"Success! Website/URL: {website}, Login: {user}, Password: {password}, saved successfully."
+            save_success = f"Success! Website/URL, Login and Password saved successfully."
             self.clear_all_entries()
             return self.show_error_area_label(save_success)
         # # except PermissionError:
