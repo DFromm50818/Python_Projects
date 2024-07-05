@@ -1,9 +1,9 @@
+import string
 from tkinter import filedialog
 import json
 import os
 from random import choice, shuffle
 from cryptography.fernet import Fernet
-import string
 
 
 class Data:
